@@ -9,18 +9,46 @@ import {
     Text, TouchableOpacity,
     View
 } from "react-native";
-import {ISet, IWord} from "../types";
+import {ActionTypes, ICurrentCard, ISet, IWord} from "../types";
 import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import * as Haptics from 'expo-haptics'
 import * as fa from '@fortawesome/free-solid-svg-icons'
-import {useSharedValue, withTiming} from "react-native-reanimated";
+import Animated, {
+    Easing, runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withDecay,
+    withSpring,
+    withTiming
+} from "react-native-reanimated";
 import WordCards from "../components/WordCards";
 import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
-
+import {useTypedSelector} from "../hooks/useTypedSelector";
+import {useDispatch} from "react-redux";
+import {Gesture, GestureDetector, PanGestureHandler} from "react-native-gesture-handler";
+let { width } = Dimensions.get('window')
 const SetPage = ({navigation,route}) => {
+    let dispatch = useDispatch()
     const translateY = useSharedValue(0)
-    const { words, name }:ISet = route.params
+    const state = useTypedSelector(state1 => state1.mainReducer)
+    // const { words, name }:ISet = route.params
     let rotateX = useRef(new AnimatedRN.Value(0))
     const [flipped,setFlipped] = useState(false)
+    let swipeGesture = Gesture.Pan()
+        .onUpdate(e=>{
+            console.log('skdfjl')
+        })
+    useEffect(()=>{
+        dispatch({
+            type:ActionTypes.SET_CURRENT_CARD,
+            data: {
+                word:state.currentSet?.words[0],
+                x:0,
+                y:0
+            } as ICurrentCard
+        })
+    //
+    },[])
     useEffect(()=>{
         AnimatedRN.timing(rotateX.current,{
             toValue:flipped ? 1 : 0,
@@ -30,7 +58,7 @@ const SetPage = ({navigation,route}) => {
     },[flipped])
     return (
         <>
-            <WordCards words={words} translateY={translateY}/>
+            <WordCards words={state.currentSet?.words} translateY={translateY}/>
             <View style={{width:'100%',height:90,justifyContent:'center',paddingLeft:30,backgroundColor:'#fff'}}>
                 <TouchableOpacity onPress={()=>navigation.goBack()}><FontAwesomeIcon size={23} color={"#888"} icon={faArrowLeft}/></TouchableOpacity>
             </View>
@@ -39,7 +67,7 @@ const SetPage = ({navigation,route}) => {
 
             <ScrollView style={{marginBottom:20}} showsHorizontalScrollIndicator={false} snapToInterval={Dimensions.get('window').width} decelerationRate={"fast"} horizontal={true}>
                 <View style={{flexDirection:'row'}}>
-            {words.map((el:IWord)=>{
+            {state.currentSet?.words.map((el:IWord)=>{
                 return (
                     <View style={{
                         width:Dimensions.get('window').width,
@@ -86,20 +114,23 @@ const SetPage = ({navigation,route}) => {
                         fontFamily:'HurmeGeomBold',
                         fontSize:35,
                         color:'#555'
-                    }}>{name}</Text>
+                    }}>{state.currentSet?.name}</Text>
                     <Text style={{
                         fontFamily:'HurmeGeomSemiBold',
                         fontSize:18,
                         marginTop:15,
                         marginLeft:5
                     }}>
-                        {words.length} words
+                        {state.currentSet?.words.length} words
                     </Text>
                 </View>
                 <View style={{width:'90%',gap:10,marginTop:10}}>
                     <Pressable onPress={()=>{
                         console.log('dfkjdsl')
-                        translateY.value = withTiming(-Dimensions.get('window').height)
+                        translateY.value = withSpring(-Dimensions.get('window').height,{
+                            stiffness:300,
+                            velocity:4
+                        })
                     }} style={styles.exercise}>
                         <FontAwesomeIcon size={25}  color={'#555'} icon={fa.faSimCard}/>
                         <View style={{
@@ -135,20 +166,51 @@ const SetPage = ({navigation,route}) => {
                     <Text style={{fontFamily:'HurmeGeomSemiBold',fontSize:20}}>Words</Text>
                 </View>
                 <View style={{width:'90%',gap:17}}>
-                    {words.map(word=>{
+                    {state.currentSet?.words.map(( word, index)=>{
+                        //
+                        let swipeX = useSharedValue(0)
+                        let [ctx,setCtx] = useState(0)
+                        let wordStyles = useAnimatedStyle(()=>{
+                            return {
+                                transform:[{translateX:swipeX.value}]
+                            }
+                        })
+                        let gesture = Gesture.Pan()
+                            .onBegin(e=> {
+                                runOnJS(setCtx)(swipeX.value)
+                            })
+                            .onUpdate(e=>{
+                                swipeX.value = ctx + e.translationX
+                            })
+                            .onEnd(e=>{
+                                if(swipeX.value > -width/2){
+                                    swipeX.value = withTiming(0)
+                                }
+                                else {
+                                    swipeX.value = withTiming(-500)
+                                    runOnJS(dispatch)({
+                                        type:ActionTypes.REMOVE_WORD,
+                                        data:word.word
+                                    })
+
+                                }
+                            })
                         return (
-                            <Pressable style={styles.word} >
+                            <GestureDetector gesture={gesture}>
+                            <Animated.View style={[styles.word]} >
                                 <Text style={{
                                     fontFamily:'HurmeGeomSemiBold',
                                     fontSize:18,
                                     color:'#333444'
-                                }}>{word.word}</Text>
+                                }}>{word.word}{index}</Text>
                                 <Text style={{
                                     fontFamily:'HurmeGeomSemiBold',
                                     fontSize:18,
                                     color:'#333444'
                                 }}>{word.translation}</Text>
-                            </Pressable>
+                                {/*<Animated.View style={[{zIndex:-1,top:0,left:0,width:'100%',height:'100%',backgroundColor:'#ccc',position:'absolute'},wordStyles]}></Animated.View>*/}
+                            </Animated.View>
+                            </GestureDetector>
                         )
                     })}
                 </View>
@@ -171,11 +233,12 @@ const styles = StyleSheet.create({
     word:{
         width:'100%',
         height:90,
-        backgroundColor:'#ccc',
+        backgroundColor:'red',
         borderRadius:10,
         justifyContent:'space-evenly',
-        paddingLeft:20,
-        paddingVertical:10
+        // paddingLeft:20,
+        overflow:'hidden'
+        // paddingVertical:10
     }
 })
 export default SetPage;

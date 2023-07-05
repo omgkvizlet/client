@@ -33,21 +33,25 @@ const FlagsSelection = ({navigation,route}) => {
                         flexDirection:'row',
                         alignItems:'center',
                         width:'90%',
-                        height:90,
+                        height:70,
                         backgroundColor:'#ddd',
-                        // borderColor:'#FFF9C9',
-                        borderWidth:2,
+                        borderColor:'#ccc',
+                        borderWidth:1,
                         borderRadius:10,
                         gap:30,
                         paddingLeft:20
                     }}>
                         {/*@ts-ignore*/}
                         <Image source={{uri:Langs[el]}}
-                               style={{width:60,height:60,borderRadius:'50%'}}
+                               style={{
+                                   width:40,
+                                   height:40,
+                                   borderRadius:'50%'
+                        }}
                         />
                         <Text style={{
-                            fontSize:20,
-                            color:'#777',
+                            fontSize:19,
+                            color:'#555',
                             //
                             fontFamily:'HurmeGeomSemiBold',
                         }}>{el}</Text>

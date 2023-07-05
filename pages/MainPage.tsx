@@ -9,15 +9,21 @@ import {
     TouchableOpacity,
     View
 } from "react-native";
+import translate from 'translate'
+import DropDownPicker from 'react-native-dropdown-picker'
 import NavBar from "../components/NavBar";
+import {v2} from '@google-cloud/translate'
 import * as Speech from 'expo-speech'
 import { useTypedSelector } from "../hooks/useTypedSelector";
-import {ActionTypes, IWord, Langs, Languages} from "../types";
+import {ActionTypes, IWord, Langs, Languages, LanguagesAbbreviations} from "../types";
 import Animated, {useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated'
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faToiletPaper, faXmark, faArrowRight, faVolumeUp, faSquare, faLock } from '@fortawesome/free-solid-svg-icons'
 import { useDispatch } from "react-redux";
 import { StackNavigationConfig } from "@react-navigation/stack/lib/typescript/src/types";
+import * as Picker from "@react-native-picker/picker";
+import Translate from "translate";
+// const {Translate} = v2
 const MainPage = ({ navigation }) => {
     let hren = useRef<TextInput>()
     const[spoken,setSpoken] = useState(false)
@@ -57,6 +63,12 @@ const MainPage = ({ navigation }) => {
             y.value = contentOffset.y
         }
     })
+    const [open, setOpen] = useState(false);
+    const [value, setValue] = useState(null);
+    const [items, setItems] = useState([
+        {label: 'Apple', value: 'apple'},
+        {label: 'Banana', value: 'banana'}
+    ]);
     //
     useEffect(()=>{
         // @ts-ignore
@@ -66,10 +78,12 @@ const MainPage = ({ navigation }) => {
     },[spoken])
     return (
        <>
+
            <NavBar y={y}/>
            <Animated.ScrollView scrollEventThrottle={16} onScroll={scrollerHandler}>
                {/**/}
                <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingTop:140}}>
+
                <View style={{
                    width:'90%',
                    backgroundColor:'#ddd',
@@ -105,6 +119,7 @@ const MainPage = ({ navigation }) => {
                        }}/>
                        <Text style={{
                            textAlign:'center',
+                           color:'#666',
                            fontSize:17,
                            fontFamily:'HurmeGeomSemiBold'
                        }}>{state.currentLang1}</Text>
@@ -153,6 +168,7 @@ const MainPage = ({ navigation }) => {
                        <Text style={{
                            fontSize:17,
                            textAlign:'center',
+                           color:'#666',
                            fontFamily:'HurmeGeomSemiBold'
                        }}>{state.currentLang2}</Text>
                    </Pressable>
@@ -168,8 +184,8 @@ const MainPage = ({ navigation }) => {
                        borderColor:'#ccc'
                    }}>
                        <TouchableOpacity onPress={()=>{
-                           console.log('dfjkghdfkjgdfhkj')
                            setText('')
+                           console.log(text)
                        }} style={{
                            position:'absolute',
                            right:20,
@@ -177,16 +193,32 @@ const MainPage = ({ navigation }) => {
                            top:20
                        }}><FontAwesomeIcon size={20} color={'#aaa'} icon={faXmark}/></TouchableOpacity>
                        <TouchableOpacity onPress={()=>{
-                           setTranslation({
-                               translation:text,
-                           })
+                           // @ts-ignore
+                           console.log(LanguagesAbbreviations[state.currentLang2])
+                           // @ts-ignore
+                           Translate(text,{
+                               key:'AIzaSyCTbugGk9WPCvHZmv8gH0iLa79vtbtKrdE',
+                               // @ts-ignore
+                               from:LanguagesAbbreviations[state.currentLang1],
+                               // @ts-ignore
+                               to:LanguagesAbbreviations[state.currentLang2],
+
+                               engine:'google'
+                           }).then((res)=>{setTranslation({
+                               translation:res
+                           })})
                        }} style={{
                            position:'absolute',
                            bottom:20,
                            zIndex:1,
-                           right:20
+                           width:40,
+                           height:40,
+                           alignItems:'center',
+                           // backgroundColor:'#000',
+                           justifyContent:'center',
+                           right:10
                        }}><FontAwesomeIcon size={20} color={'#aaa'} icon={faArrowRight}/></TouchableOpacity>
-                       <TextInput onChangeText={text=>{
+                       <TextInput value={text} onChangeText={text=>{
                            setText(text)
                        }} ref={hren} onBlur={()=>{
                            text.length ===0 && AnimatedRN.spring(translate,{
@@ -350,9 +382,12 @@ const MainPage = ({ navigation }) => {
                            {/**/}
                            {state.sets.map(set=>{
                                return <Pressable onPress={()=>{
-                                   navigation.navigate('SET_PAGE',{
-                                       ...set
+                                   console.log(set.words)
+                                   dispatch({
+                                       type:ActionTypes.FETCH_SET,
+                                       data:set
                                    })
+                                   navigation.navigate('SET_PAGE')
                                }} style={{
                                    borderRadius:10,
                                    width:320,

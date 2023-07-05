@@ -1,7 +1,13 @@
 import {ActionTypes, IAction, IState, Languages} from "../types";
+import {withSpring} from "react-native-reanimated";
 
-const initialState:IState = {
+const returnContext = function(){
+    return this
+}
+let initialState:IState = {
     sets:[{
+        //
+        randomArr:[1,2,3,4,5,6],
         name:'Transport',
         words:[{
             word:'Transport',
@@ -10,23 +16,25 @@ const initialState:IState = {
             sex:'m',
         },{
         word:'Transport',
-        translation:'der Verkehr',
+        translation:'der ldskfjlskdj',
         partOfLanguage:'noun',
         sex:'m',
     },{
         word:'Transport',
-        translation:'der Verkehr',
+        translation:'der dlskfjlskfgjdlk',
         partOfLanguage:'noun',
         sex:'m',
     },{
         word:'Transport',
-        translation:'der Verkehr',
+        translation:'der AAAA',
         partOfLanguage:'noun',
         sex:'m',
     }],
-        fromLanguage:Languages.ENGLISH,
-        toLanguage:Languages.GERMAN,
-        visibility:'private'
+        // @ts-ignore
+        fromLanguage:Languages['English'],
+        // @ts-ignore
+        toLanguage:Languages['German'],
+        visibility:'private',
     },{
         name:'Food',
         words:[{
@@ -35,8 +43,10 @@ const initialState:IState = {
             partOfLanguage:'noun',
             sex:'f',
         }],
-        fromLanguage:Languages.ENGLISH,
-        toLanguage:Languages.UKRAINIAN,
+        // @ts-ignore
+        fromLanguage:Languages['English'],
+        // @ts-ignore
+        toLanguage:Languages['Ukrainian'],
         visibility:'private'
     }, {
         name: 'Fine',
@@ -46,12 +56,14 @@ const initialState:IState = {
             partOfLanguage: 'noun',
             sex: 'm',
         }],
-        fromLanguage:Languages.ENGLISH,
-        toLanguage:Languages.SPANISH,
+        // @ts-ignore
+        fromLanguage:Languages['English'],
+        // @ts-ignore
+        toLanguage:Languages['Spanish'],
         visibility:'public'
     },
         {
-            name:'Food',
+            name:'AAA',
             words:[{
                 word:'Food',
                 translation:'Їжа',
@@ -59,38 +71,46 @@ const initialState:IState = {
                 sex:'f',
             }
             ],
-            fromLanguage:Languages.ENGLISH,
-            toLanguage:Languages.UKRAINIAN,
+            // @ts-ignore
+            fromLanguage:Languages['English'],
+            // @ts-ignore
+            toLanguage:Languages['Ukrainian'],
             visibility:'private'
         },
         {
-            name:'Food',
+            name:'lkjlkjlkj',
             words:[{
                 word:'Food',
                 translation:'Їжа',
                 partOfLanguage:'noun',
                 sex:'f',
             }],
-            fromLanguage:Languages.ENGLISH,
-            toLanguage:Languages.UKRAINIAN,
+            // @ts-ignore
+            fromLanguage:Languages['ENGLISH'],
+            // @ts-ignore
+            toLanguage:Languages['Ukrainian'],
             visibility:'public'
         },
         {
-            name:'Food',
+            name:'kjdflkds',
             words:[{
                 word:'Food',
                 translation:'Їжа',
                 partOfLanguage:'noun',
                 sex:'f',
             }],
-            fromLanguage:Languages.ENGLISH,
-            toLanguage:Languages.UKRAINIAN,
+            // @ts-ignore
+            fromLanguage:Languages['English'],
+            // @ts-ignore
+            toLanguage:Languages['Ukrainian'],
             visibility:'private'
         },
     ],
 
-    currentLang1:Languages.SPANISH,
-    currentLang2:Languages.ENGLISH
+    // @ts-ignore
+    currentLang1:Languages['Spanish'],
+    // @ts-ignore
+    currentLang2:Languages['English']
 
 }
 
@@ -106,6 +126,8 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
                 }
                 return el
             })}
+        case ActionTypes.FETCH_SET:
+            return {...state, currentSet:action.data}
         case ActionTypes.ADD_SET:
             return {...state,sets:state.sets.concat(action.data)}
         case ActionTypes.CHANGE_LANG1:
@@ -114,7 +136,33 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
         case ActionTypes.CHANGE_LANG2:
             console.log('2');
             return {...state,currentLang2:action.data}
-
+        case ActionTypes.RETURN_CARD:
+            return {
+                ...state,
+                currentSet:{
+                    ...state.currentSet,
+                    // @ts-ignore
+                    currentCard:{
+                        ...state.currentSet?.currentCard,
+                        x:withSpring(0),
+                        y:withSpring(0)
+                    }
+                }
+            }
+        case ActionTypes.SET_CURRENT_CARD:
+            // @ts-ignore
+            return {...state,currentSet:{...state.currentSet,currentCard:action.data}}
+        case ActionTypes.REMOVE_WORD:
+            console.log(action.data)
+            // @ts-ignore
+            return {...state,sets:state.sets.map(set=>{
+                if(set.name == state.currentSet?.name){
+                    set.words = set.words.filter(el=>el.word != action.data)
+                }
+                return set
+                //
+                // @ts-ignore
+                }),currentSet:{...state.currentSet,words:state.currentSet.words.filter(el=>el.word!=action.data)}}
         default:
             return {...state}
     }
