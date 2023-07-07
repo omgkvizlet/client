@@ -26,8 +26,14 @@ import {faArrowLeft} from "@fortawesome/free-solid-svg-icons";
 import {useTypedSelector} from "../hooks/useTypedSelector";
 import {useDispatch} from "react-redux";
 import {Gesture, GestureDetector, PanGestureHandler} from "react-native-gesture-handler";
+import Button from "../components/UI/Button";
+import {NavigationProp, RouteProp} from "@react-navigation/native";
 let { width } = Dimensions.get('window')
-const SetPage = ({navigation,route}) => {
+interface ISetPageProps {
+    navigation:NavigationProp<any>,
+    route:RouteProp<any>
+}
+const SetPage = ({navigation,route}:ISetPageProps) => {
     let dispatch = useDispatch()
     const translateY = useSharedValue(0)
     const state = useTypedSelector(state1 => state1.mainReducer)
@@ -36,7 +42,6 @@ const SetPage = ({navigation,route}) => {
     const [flipped,setFlipped] = useState(false)
     let swipeGesture = Gesture.Pan()
         .onUpdate(e=>{
-            console.log('skdfjl')
         })
     useEffect(()=>{
         dispatch({
@@ -60,7 +65,7 @@ const SetPage = ({navigation,route}) => {
         <>
             <WordCards words={state.currentSet?.words} translateY={translateY}/>
             <View style={{width:'100%',height:90,justifyContent:'center',paddingLeft:30,backgroundColor:'#fff'}}>
-                <TouchableOpacity onPress={()=>navigation.goBack()}><FontAwesomeIcon size={23} color={"#888"} icon={faArrowLeft}/></TouchableOpacity>
+                <TouchableOpacity style={{width:50,height:50,justifyContent:'center',alignItems:'center'}} onPress={()=>navigation.goBack()}><FontAwesomeIcon size={23} color={"#888"} icon={faArrowLeft}/></TouchableOpacity>
             </View>
         <ScrollView>
             <View style={{flex:1,alignItems:'center',paddingBottom:60,paddingTop:30}}>
@@ -124,43 +129,82 @@ const SetPage = ({navigation,route}) => {
                         {state.currentSet?.words.length} words
                     </Text>
                 </View>
-                <View style={{width:'90%',gap:10,marginTop:10}}>
-                    <Pressable onPress={()=>{
-                        console.log('dfkjdsl')
+                <View style={{width:'90%',gap:20,marginTop:10}}>
+                    <Button styles={{
+                        btn:{
+                            gap:20,
+                            alignItems:'center',
+                            paddingHorizontal:15,
+                        },
+                        animView:{
+                            width:styles.exercise.width,
+                            height:styles.exercise.height
+                        }
+                    }} onPressFn={()=>{
                         translateY.value = withSpring(-Dimensions.get('window').height,{
                             stiffness:300,
                             velocity:4
                         })
-                    }} style={styles.exercise}>
+                    }}>
                         <FontAwesomeIcon size={25}  color={'#555'} icon={fa.faSimCard}/>
                         <View style={{
-                            width:300
+                            width:'70%'
                         }}>
                             <Text style={{fontFamily:'HurmeGeomBold'}}>Cards</Text>
                             <Text style={{fontFamily:'HurmeGeom2'}} numberOfLines={1}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
                         </View>
-                    </Pressable>
-                    <Pressable style={styles.exercise}>
+                    </Button>
+                    <Button styles={{
+                        btn:{
+                            gap:20,
+                            alignItems:'center',
+                            paddingHorizontal:15,
+                        },
+                        animView:{
+                            width:styles.exercise.width,
+                            height:styles.exercise.height
+                        }
+                    }}>
                         <FontAwesomeIcon size={25}  color={'#555'} icon={fa.faBarsProgress}/>
-                        <View  style={{width:300}}>
+                        <View  style={{width:'70%'}}>
                             <Text style={{fontFamily:'HurmeGeomBold'}}>Learn</Text>
                             <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
                         </View>
-                    </Pressable>
-                    <Pressable style={styles.exercise}>
+                    </Button>
+                    <Button styles={{
+                        btn:{
+                            gap:20,
+                            alignItems:'center',
+                            paddingHorizontal:15,
+                        },
+                        animView:{
+                            width:styles.exercise.width,
+                            height:styles.exercise.height
+                        }
+                    }}>
                         <FontAwesomeIcon size={25} color={'#555'} icon={fa.faListCheck}/>
-                        <View  style={{width:300}}>
+                        <View  style={{width:'70%'}}>
                             <Text style={{fontFamily:'HurmeGeomBold'}}>Test</Text>
                             <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
                         </View >
-                    </Pressable>
-                    <Pressable style={styles.exercise}>
+                    </Button>
+                    <Button styles={{
+                        btn:{
+                            gap:20,
+                            alignItems:'center',
+                            paddingHorizontal:15,
+                        },
+                        animView:{
+                            width:styles.exercise.width,
+                            height:styles.exercise.height
+                        }
+                    }}>
                         <FontAwesomeIcon size={25} color={'#555'} icon={fa.faObjectUngroup}/>
-                        <View style={{width:300}}>
+                        <View style={{width:'70%'}}>
                             <Text style={{fontFamily:'HurmeGeomBold'}}>Order</Text>
                             <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
                         </View>
-                    </Pressable>
+                    </Button>
                 </View>
                 <View style={{width:'90%',height:80,justifyContent:'center',paddingLeft:20,paddingTop:10}}>
                     <Text style={{fontFamily:'HurmeGeomSemiBold',fontSize:20}}>Words</Text>
@@ -228,17 +272,16 @@ const styles = StyleSheet.create({
         flexDirection:'row',
         alignItems:'center',
         paddingHorizontal:15,
-        gap:20
+        gap:20,
     },
     word:{
         width:'100%',
         height:90,
-        backgroundColor:'red',
+        backgroundColor:'#ccc',
         borderRadius:10,
         justifyContent:'space-evenly',
-        // paddingLeft:20,
-        overflow:'hidden'
-        // paddingVertical:10
+        paddingLeft:20,
+        paddingVertical:10
     }
 })
 export default SetPage;

@@ -13,13 +13,45 @@ export enum Langs {
 
     Japanese = "https://upload.wikimedia.org/wikipedia/en/thumb/9/9e/Flag_of_Japan.svg/800px-Flag_of_Japan.svg.png",
 
-    Albanian = "https://cdn.britannica.com/00/6200-004-42B7690E/Flag-Albania.jpg"
+    Albanian = "https://cdn.britannica.com/00/6200-004-42B7690E/Flag-Albania.jpg",
+
+    russian = "https://upload.wikimedia.org/wikipedia/commons/8/8a/LGBT_Rainbow_Flag.png"
 }
 export enum LanguagesAbbreviations{
 
 }
 const langsAbbreviationsArr = ['cs','de','en','es','uk','ja','sq']
-Object.keys(Langs).forEach(( lang, index) => LanguagesAbbreviations[lang] = langsAbbreviationsArr[index])
+// @ts-ignore
+Object.keys(Langs).forEach(( lang:string, index) => LanguagesAbbreviations[lang] = langsAbbreviationsArr[index])
+
+export interface IAuthState {
+    user:IUser | null,
+    status? :LoadingStatuses,
+    error?:Error | null
+}
+export interface IUser {
+    email?:string,
+    username:string,
+    password:string,
+    token?:string
+}
+
+export enum LoadingStatuses {
+    ERROR,
+    LOADING,
+    SUCCESS
+}
+
+export enum AuthActionTypes {
+    AUTH_LOGOUT = "AUTH_LOGOUT",
+
+    AUTH_SUCCESS = "AUTH_SUCCESS",
+
+    AUTH_ERROR = "AUTH_ERROR",
+
+    AUTH_LOADING = "AUTH_LOADING"
+
+}
 
 export enum ActionTypes {
     REMOVE_WORD = "REMOVE_WORD",
@@ -44,8 +76,8 @@ export enum ActionTypes {
 
 }
 export interface IAction {
-    data:any,
-    type:ActionTypes
+    data?:any,
+    type:ActionTypes | AuthActionTypes
 }
 export enum Languages {
 

@@ -81,10 +81,8 @@ const Card = ({ word, index }:ICardProps) => {
 
         })
         .onEnd(event => {
-            console.log(-width/2, cardTranslateX, cardTranslateY,cardTranslateX.value < -width/2)
             if(cardTranslateX.value < -width/3){
                 runOnJS(setCounter)(counter + 1)
-                console.log('AAAA',counter)
                 runOnJS(setCounters)({...counters,yetLearn:counters.yetLearn + 1})
                 cardTranslateX.value = withSpring(-500)
                 scaleX.value = withSpring(scaleX.value + width)
@@ -92,7 +90,6 @@ const Card = ({ word, index }:ICardProps) => {
             else if(cardTranslateX.value > width/3){
 
                 runOnJS(setCounter)(counter + 1)
-                console.log('AAAA',counter)
                 cardTranslateX.value = withSpring(500)
             }
             else if(cardTranslateX.value  > -width/3 || cardTranslateX.value < width/3){

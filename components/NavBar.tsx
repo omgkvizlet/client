@@ -1,15 +1,26 @@
-import React from 'react';
-import {Image, Text, View} from "react-native";
+import React, {useEffect} from 'react';
+import {Image, Text, TouchableOpacity, View} from "react-native";
 import * as Device from "expo-device";
 import Animated, {Extrapolation, interpolate, useAnimatedStyle} from "react-native-reanimated";
-
-const NavBar = ({y}) => {
+import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
+import {faRightFromBracket} from '@fortawesome/free-solid-svg-icons'
+import {useActions} from "../hooks/useActions";
+import {useNavigation} from "@react-navigation/native";
+import {SharedValue} from "react-native-reanimated/lib/types/lib";
+import {useTypedSelector} from "../hooks/useTypedSelector";
+interface INavBarProps {
+    y:SharedValue<number>
+}
+const NavBar = ({y}:INavBarProps) => {
+    let navigation = useNavigation()
+    let state = useTypedSelector(state1 => state1.authReducer)
+    const { logoutActionCreator } = useActions()
     let animNavBarStyles = useAnimatedStyle(()=>{
         return {
             height:interpolate(
                 y.value,
                 [0,150],
-                [130,100],
+                [100,100],
                 Extrapolation.CLAMP
             ),
         }
@@ -32,20 +43,9 @@ const NavBar = ({y}) => {
             )
         }
     })
-    let imgAnimStyles = useAnimatedStyle(()=>{
-        return {
-            transform:[
-                {
-                    translateY:interpolate(
-                        y.value,
-                        [0,20],
-                        [Number(Device.modelName?.replace(/\D+/g,'')) ? 10 : 0,10]
-                    )
-                }
-            ]
-        }
-    })
-    // @ts-ignore
+    useEffect(()=>{
+        console.log(state)
+    },[])
     return (
         <Animated.View style={[{
             backgroundColor:'#e6e6e6',
@@ -53,7 +53,8 @@ const NavBar = ({y}) => {
             alignItems:'center',
             position:'absolute',
             zIndex:1,
-            paddingTop:Number(Device.modelName?.replace(/\D+/g,'')) >= 10 ? 20 : 0,
+            paddingTop:10,
+            // paddingTop:Number(Device.modelName?.replace(/\D+/g,'')) >= 10 ? 20 : 0,
             flexDirection:'row',
             justifyContent:'space-evenly'
         },animNavBarStyles]}>
@@ -64,24 +65,30 @@ const NavBar = ({y}) => {
             }}>
             <Animated.Text style={[{
                 fontFamily:'HurmeGeom',
-                color:'#999',
+                color:'#555',
                 fontSize:16
             },welcomeAnimStyles]}>Welcome back</Animated.Text>
             <Text style={{
                 fontFamily:'HurmeGeomBold',
-                fontSize:22
+                fontSize:22,
+                color:'#333'
             }}>Eblan</Text>
+
             </View>
-            {/**/}
-            <Animated.Image source={{
-                uri:'https://wallpapers.com/images/hd/eric-clapton-guitar-while-smoking-dun523q2t0xqrulu.jpg'
-            }} style={[{
-                width:50, height:50,
-                //
-                borderRadius:'12%',
+            <TouchableOpacity onPress={()=>{
+                logoutActionCreator(navigation)
+            }} style={{
+                width:50,
+                height:50,
                 position:'absolute',
+                // backgroundColor:'#000',
+                transform:[{translateY:10}],
+                justifyContent:'center',
+                alignItems:'center',
                 right:20,
-            },]}/>
+            }}>
+                <FontAwesomeIcon size={25} color={'#555'} icon={faRightFromBracket}/>
+            </TouchableOpacity>
         </Animated.View>
     );
 };

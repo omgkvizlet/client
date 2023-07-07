@@ -1,32 +1,30 @@
-import {ActionTypes, IAction, IState, Languages} from "../types";
+import {ActionTypes, IAction, IState, Languages} from "../../types";
 import {withSpring} from "react-native-reanimated";
 
-const returnContext = function(){
-    return this
-}
+
 let initialState:IState = {
     sets:[{
         //
         randomArr:[1,2,3,4,5,6],
         name:'Transport',
         words:[{
-            word:'Transport',
-            translation:'der Verkehr',
+            word:'Word',
+            translation:'Translation',
             partOfLanguage:'noun',
             sex:'m',
         },{
-        word:'Transport',
-        translation:'der ldskfjlskdj',
+        word:'Worc',
+        translation:'translation',
         partOfLanguage:'noun',
         sex:'m',
     },{
-        word:'Transport',
-        translation:'der dlskfjlskfgjdlk',
+        word:'Worc',
+        translation:'translation',
         partOfLanguage:'noun',
         sex:'m',
     },{
-        word:'Transport',
-        translation:'der AAAA',
+        word:'Worc',
+        translation:'translation',
         partOfLanguage:'noun',
         sex:'m',
     }],
@@ -38,8 +36,8 @@ let initialState:IState = {
     },{
         name:'Food',
         words:[{
-            word:'Food',
-            translation:'Їжа',
+            word:'Worc',
+            translation:'translation',
             partOfLanguage:'noun',
             sex:'f',
         }],
@@ -51,8 +49,8 @@ let initialState:IState = {
     }, {
         name: 'Fine',
         words: [{
-            word: 'Fine',
-            translation: 'Bien',
+            word: 'Worc',
+            translation: 'translation',
             partOfLanguage: 'noun',
             sex: 'm',
         }],
@@ -65,8 +63,8 @@ let initialState:IState = {
         {
             name:'AAA',
             words:[{
-                word:'Food',
-                translation:'Їжа',
+                word:'Worc',
+                translation:'translation',
                 partOfLanguage:'noun',
                 sex:'f',
             }
@@ -80,8 +78,8 @@ let initialState:IState = {
         {
             name:'lkjlkjlkj',
             words:[{
-                word:'Food',
-                translation:'Їжа',
+                word:'Worc',
+                translation:'translation',
                 partOfLanguage:'noun',
                 sex:'f',
             }],
@@ -94,8 +92,8 @@ let initialState:IState = {
         {
             name:'kjdflkds',
             words:[{
-                word:'Food',
-                translation:'Їжа',
+                word:'Worc',
+                translation:'translation',
                 partOfLanguage:'noun',
                 sex:'f',
             }],
@@ -106,7 +104,7 @@ let initialState:IState = {
             visibility:'private'
         },
     ],
-
+    //
     // @ts-ignore
     currentLang1:Languages['Spanish'],
     // @ts-ignore

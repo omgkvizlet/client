@@ -23,9 +23,12 @@ import { useDispatch } from "react-redux";
 import { StackNavigationConfig } from "@react-navigation/stack/lib/typescript/src/types";
 import * as Picker from "@react-native-picker/picker";
 import Translate from "translate";
+import {NavigationProp} from "@react-navigation/native";
+interface IMainPageProps {
+    navigation:NavigationProp<any>
+}
 // const {Translate} = v2
-const MainPage = ({ navigation }) => {
-    let hren = useRef<TextInput>()
+const MainPage = ({ navigation }:IMainPageProps) => {
     const[spoken,setSpoken] = useState(false)
     let dispatch = useDispatch()
     const[translation,setTranslation] = useState<Partial<IWord>>({
@@ -55,7 +58,6 @@ const MainPage = ({ navigation }) => {
     },[focused])
     useEffect(()=>{
         !Speech.isSpeakingAsync() && setSpoken(false)
-        console.log('hueifhdskjfhdskjfh')
     },[Speech.isSpeakingAsync()])
     const y = useSharedValue(0)
     let scrollerHandler = useAnimatedScrollHandler({
@@ -76,13 +78,14 @@ const MainPage = ({ navigation }) => {
             language:state.currentLang2
         }) : Speech.stop()
     },[spoken])
+    // @ts-ignore
     return (
        <>
 
            <NavBar y={y}/>
            <Animated.ScrollView scrollEventThrottle={16} onScroll={scrollerHandler}>
                {/**/}
-               <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingTop:140}}>
+               <View style={{flex:1,justifyContent:'center',alignItems:'center',paddingTop:120}}>
 
                <View style={{
                    width:'90%',
@@ -108,11 +111,11 @@ const MainPage = ({ navigation }) => {
                        justifyContent:'center',
                        gap:11
                    }}>
+                       {/*@ts-ignore*/}
                        <Image style={{
                            width:40,
                            height:40,
                            borderRadius:'50%'
-
                        }} source={{
                            // @ts-ignore
                            uri:Langs[state.currentLang1],
@@ -157,6 +160,7 @@ const MainPage = ({ navigation }) => {
                        gap:11
 
                    }}>
+                       {/*@ts-ignore*/}
                        <Image style={{
                            width:40,
                            height:40,
@@ -185,7 +189,6 @@ const MainPage = ({ navigation }) => {
                    }}>
                        <TouchableOpacity onPress={()=>{
                            setText('')
-                           console.log(text)
                        }} style={{
                            position:'absolute',
                            right:20,
@@ -194,7 +197,6 @@ const MainPage = ({ navigation }) => {
                        }}><FontAwesomeIcon size={20} color={'#aaa'} icon={faXmark}/></TouchableOpacity>
                        <TouchableOpacity onPress={()=>{
                            // @ts-ignore
-                           console.log(LanguagesAbbreviations[state.currentLang2])
                            // @ts-ignore
                            Translate(text,{
                                key:'AIzaSyCTbugGk9WPCvHZmv8gH0iLa79vtbtKrdE',
@@ -220,7 +222,7 @@ const MainPage = ({ navigation }) => {
                        }}><FontAwesomeIcon size={20} color={'#aaa'} icon={faArrowRight}/></TouchableOpacity>
                        <TextInput value={text} onChangeText={text=>{
                            setText(text)
-                       }} ref={hren} onBlur={()=>{
+                       }} onBlur={()=>{
                            text.length ===0 && AnimatedRN.spring(translate,{
                                toValue:{
                                    x:0,
@@ -245,7 +247,7 @@ const MainPage = ({ navigation }) => {
                            fontFamily:'HurmeGeom2',
                            fontSize:20
                        }}/>
-                       <AnimatedRN.View style={{
+                       <AnimatedRN.View pointerEvents={"none"} style={{
                            position:'absolute',
                            zIndex:1,
                            top:20,
@@ -363,26 +365,33 @@ const MainPage = ({ navigation }) => {
                    <View style={{
                        width:'90%',
                        height:60,
-                       justifyContent:'center',
+                       justifyContent:'space-between',
+                       alignItems:'center',
                        paddingLeft:10,
+                       flexDirection:'row',
                    }}>
                        <Text style={{
                            fontSize:17,
                            color:'#555',
                            fontFamily:'HurmeGeomSemiBold'
                        }}>Last sets</Text>
+                       <TouchableOpacity onPress={()=>{
+                           navigation.navigate('SETS_SELECTION')
+                       }}>
+                           <Text style={{fontSize:17,color:'#555',fontFamily:'HurmeGeomSemiBold'}}>Show all</Text>
+                       </TouchableOpacity>
                    </View>
                    <ScrollView snapToInterval={330} decelerationRate={"fast"} horizontal style={{paddingBottom:50}}>
                        <View style={{
                            height:150,
+                           // width:'100%',
                            paddingHorizontal:20,
                            flexDirection:'row',
                            gap:10,
                        }}>
                            {/**/}
-                           {state.sets.map(set=>{
+                           {state.sets.slice(5).map(set=>{
                                return <Pressable onPress={()=>{
-                                   console.log(set.words)
                                    dispatch({
                                        type:ActionTypes.FETCH_SET,
                                        data:set
@@ -423,7 +432,7 @@ const MainPage = ({ navigation }) => {
                                           {set.words.length} words
                                           </Text>
                                       </View>
-                                       {set.visibility==="private" && <FontAwesomeIcon color={'#444'} s icon={faLock}/> }
+                                       {set.visibility==="private" && <FontAwesomeIcon color={'#444'} icon={faLock}/> }
                                    </View>
                                </Pressable>
                            })}

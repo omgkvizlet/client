@@ -9,9 +9,12 @@ import * as ef from 'expo-font'
 import {useEffect} from "react";
 import * as fs from "fs";
 import * as path from "path";
+import Form from "./pages/Form";
+import {useFonts} from "expo-font";
 
 export default function App() {
-    ef.loadAsync(
+
+    const [loaded] = useFonts(
         {
             'HurmeGeom': require('./fonts/HurmeGeometricSans1.otf'),
             "HurmeGeomBold":require('./fonts/HurmeGeometricSans1Bold.otf'),
@@ -25,29 +28,14 @@ export default function App() {
             "HurmeGeomItalicSemiBold2":require('./fonts/HurmeGeometricSans2SemiBoldItalic.otf')
         }
     )
-    // const [loaded] = useFonts(
-    //     {
-    //         'HurmeGeom': require('./fonts/HurmeGeometricSans1.otf'),
-    //         "HurmeGeomBold":require('./fonts/HurmeGeometricSans1Bold.otf'),
-    //         "HurmeGeom2":require('./fonts/HurmeGeometricSans2.otf'),
-    //         "HurmeGeom3":require('./fonts/HurmeGeometricSans3.otf'),
-    //         "HurmeGeomBold2":require('./fonts/HurmeGeometricSans2Bold.otf'),
-    //         "HurmeGeomHairline":require('./fonts/HurmeGeometricSans1Hairline.otf'),
-    //         "HurmeGeomThin":require('./fonts/HurmeGeometricSans1Hairline.otf'),
-    //         "HurmeGeomSemiBold":require('./fonts/HurmeGeometricSans1SemiBold.otf'),
-    //         "HurmeGeomItalicBold2":require('./fonts/HurmeGeometricSans2BoldItalic.otf'),
-    //         "HurmeGeomItalicSemiBold2":require('./fonts/HurmeGeometricSans2SemiBoldItalic.otf')
-    //     }
-    // )
     //
     //
     useEffect(()=>{
-        // console.log(loaded)
+        console.log(loaded)
     },[])
   return (
       <Provider store={store}>
           <GestureHandlerRootView style={styles.container}>
-              <StatusBar hidden={true}/>
               <MainLayout/>
           </GestureHandlerRootView>
       </Provider>
@@ -56,7 +44,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-
+      flex: 1,
+      backgroundColor:'#f2f2f2'
   },
 });
