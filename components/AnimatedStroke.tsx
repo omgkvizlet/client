@@ -7,9 +7,10 @@ const AnimatedPath = Animated.createAnimatedComponent(Path)
 interface IAnimatedStrokeProps {
     d:string,
     strokeDashValue:SharedValue<number>,
-    stroke?:string
+    stroke?:string,
+    fill?:string
 }
-const AnimatedStroke = ({stroke,d,strokeDashValue}:IAnimatedStrokeProps) => {
+const AnimatedStroke = ({fill,stroke,d,strokeDashValue}:IAnimatedStrokeProps) => {
     const[length,setLength] = useState<number>(0)
     let strokeDash = useSharedValue(0)
 
@@ -28,7 +29,7 @@ const AnimatedStroke = ({stroke,d,strokeDashValue}:IAnimatedStrokeProps) => {
                     setLength(pathRef.current.getTotalLength())
                 }}
                 d={d}
-                fill={"none"}
+                fill={fill}
                 stroke={stroke}
                 strokeDasharray={length}
                 strokeWidth={10}

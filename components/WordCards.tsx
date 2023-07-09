@@ -16,29 +16,54 @@ import {Gesture, GestureDetector} from "react-native-gesture-handler";
 import Card from "./Card";
 import {useTypedSelector} from "../hooks/useTypedSelector";
 import {SharedValue} from "react-native-reanimated/lib/types/lib";
-import {IWord} from "../types";
+import {ActionTypes, IAction, IWord} from "../types";
+import {useDispatch} from "react-redux";
 
 const { width } = Dimensions.get('window')
 interface IWordCardsProps {
     words:IWord[],
-    translateY:SharedValue<number>
-}
-const WordCards = ({words,translateY}:IWordCardsProps) => {
 
+    translateY:SharedValue<number>
+
+    setIsVisible:any
+}
+export interface ICounters {
+    yetLearn:number,
+
+    knowThat:number
+}
+const WordCards = ({ words, translateY, setIsVisible }:IWordCardsProps) => {
+    let[counters,setCounters] = useState<ICounters>({
+        yetLearn:0,
+        knowThat:0
+    })
+    const[idx,setIndex] = useState(0)
+    let translateX = useSharedValue(0)
+    let dispatch = useDispatch()
     let [ counter, setCounter ] = useState(1)
     const state = useTypedSelector(state1 => state1.mainReducer)
-    // let cardTranslateX = useRef(new AnimatedRN.Value(0)).current
-    // let cardTranslateY = useRef(new AnimatedRN.Value(0)).current
-    // let cardXY = useRef(new AnimatedRN.ValueXY()).current
-    let cardTranslateY = useSharedValue(0)
-    let cardTranslateX = useSharedValue(0)
-
-    const [ctx,setCtx] = useState({
-        x:0,
-        y:0
+    let scaleX = useSharedValue(0)
+    const learnYetStyles = useAnimatedStyle(()=>{
+        return {
+            opacity:interpolate(
+                translateX?.value,
+                [-width/3,0],
+                // #448f6e
+                [1,0]
+            //
+            )
+        }
+    })
+    const knowThatStyles = useAnimatedStyle(()=>{
+        return {
+            opacity:interpolate(
+                translateX?.value,
+                [0,width/3],
+                [0,1]
+            )
+        }
     })
 
-    let scaleX = useSharedValue(0)
     const animDialogStyles = useAnimatedStyle(()=>{
         return {
             transform:[{
@@ -46,90 +71,17 @@ const WordCards = ({words,translateY}:IWordCardsProps) => {
             }]
         }
     })
-    // let cardAnimStyles = useAnimatedStyle(()=>{
-    //     return {
-    //         transform:[{
-    //             translateY:cardTranslateY.value
-    //         },
-    //             {
-    //                 translateX:cardTranslateX.value
-    //             }
-    //         ],
-    //         backgroundColor:interpolateColor(cardTranslateX.value,[-100,0,100],['#c15e24','#ddd','#448f6e'])
-    //     }
-    // })
-    // let wordAnimStyle = useAnimatedStyle(()=>{
-    //     return {
-    //         opacity:interpolate(cardTranslateX.value,
-    //             [-width/3,0,width/3],
-    //             [0,1,0],
-    //             Extrapolation.CLAMP
-    //         )
-    //     }
-    // })
-    // let learnYetAnimStyle = useAnimatedStyle(()=>{
-    //     return {
-    //         opacity:interpolate(cardTranslateX.value,
-    //             [0,-width/3],
-    //             [0,1],
-    //             Extrapolation.CLAMP
-    //         )
-    //     }
-    // })
-    // let knowThatAnimStyle = useAnimatedStyle(()=>{
-    //     return {
-    //         opacity:interpolate(cardTranslateX.value,[0,width/3],[0,1])
-    //     }
-    // })
-    // let[counters,setCounters] = useState({
-    //     yetLearn:0,
-    //     knowThat:0
-    // })
 
-    // const gesture = Gesture.Pan()
-    //     .onUpdate(event => {
-    //         cardTranslateX.value = event.translationX + ctx.x
-    //         cardTranslateY.value = event.translationY + ctx.y
-    //     })
-    //     .onBegin(event => {
-    //        runOnJS(setCtx)({
-    //            // @ts-ignore
-    //            x:cardTranslateX.value,
-    //            // @ts-ignore
-    //            y:cardTranslateY.value
-    //        })
-    //
-    //     })
-    //     .onEnd(event => {
-    //         console.log(-width/2, cardTranslateX, cardTranslateY,cardTranslateX.value < -width/2)
-    //         if(cardTranslateX.value < -width/3){
-    //             runOnJS(setCounter)(counter + 1)
-    //             console.log('AAAA',counter)
-    //             runOnJS(setCounters)({...counters,yetLearn:counters.yetLearn + 1})
-    //             cardTranslateX.value = withSpring(-500)
-    //             scaleX.value = withSpring(scaleX.value + width/words.length)
-    //         }
-    //         else if(cardTranslateX.value > width/3){
-    //
-    //             runOnJS(setCounter)(counter + 1)
-    //             console.log('AAAA',counter)
-    //             cardTranslateX.value = withSpring(500)
-    //         }
-    //         else if(cardTranslateX.value  > -width/3 || cardTranslateX.value < width/3){
-    //             cardTranslateX.value = withSpring(0)
-    //             cardTranslateY.value = withSpring(0)
-    //         }
-    //
-    //     })
     useEffect(()=>{
-        console.log('AAAAA',state.currentSet?.words)
-    //
-    },[])
+        console.log(idx)
+    },[idx])
     const stringAnimStyles = useAnimatedStyle(()=>{
         return {
             width:scaleX.value
         }
     })
+    const x = useSharedValue(0)
+    const y = useSharedValue(0)
     return (
         <Animated.View style={[{
             width:'100%',
@@ -139,15 +91,15 @@ const WordCards = ({words,translateY}:IWordCardsProps) => {
             top:'100%',
             backgroundColor:'#fff',
         },animDialogStyles]}>
-            <View style={{justifyContent:'center',width,height:100,flexDirection:'row',alignItems:'center'}}>
+            <Animated.View style={[{paddingTop:20,justifyContent:'center',width,height:100,flexDirection:'row',alignItems:'center'}]}>
                 <TouchableOpacity onPress={()=>{
-                    console.log('dfkldsj')
+                    setTimeout(()=>setIsVisible(false),250)
                     translateY.value = withTiming(0)
                 }} style={{position:'absolute',left:20,flexGrow:1}}>
                     <FontAwesomeIcon color={'#555'} size={25} icon={faXmark}/>
                 </TouchableOpacity>
                 <View>
-                    <Text style={{fontSize:20,fontFamily:'HurmeGeomBold2',color:'#555'}}>{counter}/{words.length}</Text>
+                    <Text style={{fontSize:20,fontFamily:'HurmeGeomBold2',color:'#555'}}>{Object.values(counters).reduce((a,b)=>a+b)}/{words.length}</Text>
                 </View>
                 <View style={{width:'100%',height:5,backgroundColor:'#ccc',position:'absolute',bottom:0}}>
                     <Animated.View style={[{
@@ -157,68 +109,69 @@ const WordCards = ({words,translateY}:IWordCardsProps) => {
 
                     </Animated.View>
                 </View>
-            </View>
-            {/*<View style={{*/}
-            {/*    flexDirection:'row',*/}
-            {/*    alignItems:'center',*/}
-            {/*    marginTop:12,*/}
-            {/*    justifyContent:'space-between',*/}
-            {/*}}>*/}
-            {/*    /!*#448f6e*!/*/}
-            {/*    <View style={{*/}
-            {/*        width:37,*/}
-            {/*        height:33,*/}
-            {/*        borderLeftWidth:0,*/}
-            {/*        borderTopEndRadius:25,*/}
-            {/*        borderBottomEndRadius:25,*/}
-            {/*        borderColor:'#c15e24',*/}
-            {/*        borderWidth:2,*/}
-            {/*        justifyContent:'center',*/}
-            {/*        alignItems:'center'*/}
-            {/*    }}>*/}
-            {/*        <Animated.View style={[{*/}
-            {/*            width:'100%',*/}
-            {/*            height:'100%',*/}
-            {/*            borderTopEndRadius:25,*/}
-            {/*            borderBottomEndRadius:25,*/}
-            {/*            opacity:0,*/}
-            {/*            backgroundColor:'#c15e24',*/}
-            {/*            justifyContent:'center',*/}
-            {/*            alignItems:'center'*/}
-            {/*        },learnYetAnimStyle]}>*/}
-            {/*            <Text style={{fontSize:15, color:'#ccc',fontFamily:'HurmeGeomBold',}}>+1</Text>*/}
-            {/*        </Animated.View>*/}
-            {/*        <Text style={{zIndex:-1,position:'absolute',fontSize:15, color:'#c15e24',fontFamily:'HurmeGeomBold'}}>{counters.yetLearn}</Text>*/}
-            {/*    </View>*/}
-            {/*    <View style={{*/}
-            {/*        width:37,*/}
-            {/*        height:33,*/}
+            </Animated.View>
 
-            {/*        borderTopStartRadius:25,*/}
-            {/*        borderBottomStartRadius:25,*/}
-            {/*        borderColor:'#448f6e',*/}
-            {/*        borderWidth:2,*/}
-            {/*        justifyContent:'center',*/}
-            {/*        alignItems:'center'*/}
-            {/*    }}>*/}
-            {/*        <Animated.View style={[{*/}
-            {/*            width:'100%',*/}
-            {/*            height:'100%',*/}
-            {/*            borderTopStartRadius:25,*/}
-            {/*            borderBottomStartRadius:25,*/}
-            {/*            opacity:0,*/}
-            {/*            backgroundColor:'#448f6e',*/}
-            {/*            justifyContent:'center',*/}
-            {/*            alignItems:'center'*/}
-            {/*        },knowThatAnimStyle]}>*/}
-            {/*            <Text style={{fontSize:15, color:'#ccc',fontFamily:'HurmeGeomBold',}}>+1</Text>*/}
-            {/*        </Animated.View>*/}
-            {/*        <Text style={{zIndex:-1,position:'absolute',fontSize:15, color:'#448f6e',fontFamily:'HurmeGeomBold'}}>{counters.knowThat}</Text>*/}
-            {/*    </View>*/}
-            {/*</View>*/}
+            <View style={{
+                flexDirection:'row',
+                alignItems:'center',
+                marginTop:12,
+                justifyContent:'space-between',
+            }}>
+                {/*#448f6e*/}
+                <View style={{
+                    width:37,
+                    height:33,
+                    borderLeftWidth:0,
+                    borderTopEndRadius:25,
+                    borderBottomEndRadius:25,
+                    borderColor:'#c15e24',
+                    borderWidth:2,
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}>
+                    <Animated.View style={[{
+                        width:'100%',
+                        height:'100%',
+                        borderTopEndRadius:25,
+                        borderBottomEndRadius:25,
+                        opacity:1,
+                        backgroundColor:'#c15e24',
+                        justifyContent:'center',
+                        alignItems:'center'
+                    },learnYetStyles]}>
+                        <Text style={{fontSize:15, color:'#ccc',fontFamily:'HurmeGeomBold',}}>+1</Text>
+                    </Animated.View>
+                    <Text style={{zIndex:-1,position:'absolute',fontSize:15, color:'#c15e24',fontFamily:'HurmeGeomBold'}}>{counters.yetLearn}</Text>
+                </View>
+                <View style={{
+                    width:37,
+                    height:33,
+
+                    borderTopStartRadius:25,
+                    borderBottomStartRadius:25,
+                    borderColor:'#448f6e',
+                    borderWidth:2,
+                    justifyContent:'center',
+                    alignItems:'center'
+                }}>
+                    <Animated.View style={[{
+                        width:'100%',
+                        height:'100%',
+                        borderTopStartRadius:25,
+                        borderBottomStartRadius:25,
+                        opacity:1,
+                        backgroundColor:'#448f6e',
+                        justifyContent:'center',
+                        alignItems:'center'
+                    },knowThatStyles]}>
+                        <Text style={{fontSize:15, color:'#ccc',fontFamily:'HurmeGeomBold',}}>+1</Text>
+                    </Animated.View>
+                    <Text style={{zIndex:-1,position:'absolute',fontSize:15, color:'#448f6e',fontFamily:'HurmeGeomBold'}}>{counters.knowThat}</Text>
+                </View>
+            </View>
             <View style={{flex:1,justifyContent:'center',alignItems:'center'}}>
                 {words.map(( el,index )=>{
-                    return <Card index={index} word={el}/>
+                    return <Card scaleX={scaleX} counters={counters} setCounters={setCounters} translateX={translateX} setIdx={setIndex} idx={idx} index={index} word={el} />
                 //
 
                 })}
@@ -281,13 +234,19 @@ const WordCards = ({words,translateY}:IWordCardsProps) => {
                 alignItems:'center',
             }}>
                 <TouchableOpacity onPress={()=>{
-                    if(counter!=1) {
-                        setCounter(counter - 1)
-                        cardTranslateX.value = withSpring(0)
-                        cardTranslateY.value = withSpring(0)
-                        scaleX.value = withTiming(scaleX.value - width / words.length)
-                    }
 
+                    if(idx>0){
+                        setIndex(idx-1)
+                        scaleX.value = withTiming(scaleX.value - width/state.currentSet?.words.length)
+                    }
+                    dispatch({
+                        type: ActionTypes.RETURN_CARD,
+                    })
+                    if(Object.values(counters).every(counter=>counter>=0)) {
+                        state.currentSet?.flashCardsGame?.learned
+                            ? setCounters({...counters, knowThat: counters.knowThat - 1})
+                            : setCounters({...counters, yetLearn: counters.yetLearn - 1})
+                    }
                 }}>
                     <FontAwesomeIcon size={22} color={'#555'} icon={faRotateLeft}/>
                 </TouchableOpacity>

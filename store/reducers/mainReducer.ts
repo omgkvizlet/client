@@ -1,5 +1,4 @@
 import {ActionTypes, IAction, IState, Languages} from "../../types";
-import {withSpring} from "react-native-reanimated";
 
 
 let initialState:IState = {
@@ -8,23 +7,23 @@ let initialState:IState = {
         randomArr:[1,2,3,4,5,6],
         name:'Transport',
         words:[{
-            word:'Word',
-            translation:'Translation',
+            word:'train',
+            translation:'der Zug',
             partOfLanguage:'noun',
             sex:'m',
         },{
-        word:'Worc',
-        translation:'translation',
+        word:'bus',
+        translation:'der Bus',
         partOfLanguage:'noun',
         sex:'m',
     },{
-        word:'Worc',
-        translation:'translation',
+        word:'vehicle',
+        translation:'das Auto',
         partOfLanguage:'noun',
         sex:'m',
     },{
-        word:'Worc',
-        translation:'translation',
+        word:'subway',
+        translation:'der U-Bahn',
         partOfLanguage:'noun',
         sex:'m',
     }],
@@ -114,6 +113,26 @@ let initialState:IState = {
 
 export const mainReducer = (state = initialState, action:IAction):IState => {
     switch (action.type) {
+        case ActionTypes.SET_GUESSING_CARD2:
+            return {
+                ...state,
+                currentSet:{
+                    ...state.currentSet,
+                    // @ts-ignore
+                    matchGame:{
+                        ...state.currentSet?.matchGame,
+                        guessingCard2:action.data
+                    }
+                }
+            }
+        case ActionTypes.WRONG_MATCH:
+            console.log('IS WROT',state.currentSet?.matchGame?.isWrong)
+            return {...state, currentSet:{...state.currentSet,matchGame:{...state.currentSet?.matchGame,isWrong:!state.currentSet?.matchGame?.isWrong}}}
+        case ActionTypes.CORRECT_MATCH:
+            return {...state, currentSet:{...state.currentSet, matchGame:{...state.currentSet?.matchGame, isWrong:false}}}
+        case ActionTypes.SET_GUESSING_CARD:
+            console.log('aaa set')
+            return {...state, currentSet:{...state.currentSet,matchGame:{...state.currentSet?.matchGame,guessingCard1:action.data}}}
         case ActionTypes.SWITCH_LANGS:
             return {...state, currentLang1:state.currentLang2,currentLang2:state.currentLang1}
         case ActionTypes.ADD_WORD:
@@ -126,6 +145,18 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
             })}
         case ActionTypes.FETCH_SET:
             return {...state, currentSet:action.data}
+        case ActionTypes.LEARN_WORD:
+            return {
+                ...state,
+                currentSet:{
+                    ...state.currentSet,
+                    // @ts-ignore
+                    flashCardsGame:{
+                        ...state.currentSet?.flashCardsGame,
+                        learned:action.data
+                    }
+                }
+            }
         case ActionTypes.ADD_SET:
             return {...state,sets:state.sets.concat(action.data)}
         case ActionTypes.CHANGE_LANG1:
@@ -135,18 +166,30 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
             console.log('2');
             return {...state,currentLang2:action.data}
         case ActionTypes.RETURN_CARD:
+            console.log('lkdjflsj')
             return {
                 ...state,
                 currentSet:{
                     ...state.currentSet,
                     // @ts-ignore
-                    currentCard:{
-                        ...state.currentSet?.currentCard,
-                        x:withSpring(0),
-                        y:withSpring(0)
+                    flashCardsGame:{
+                        ...state.currentSet?.flashCardsGame,
+                        isReturned:!state.currentSet?.flashCardsGame?.isReturned
                     }
                 }
             }
+            // return {
+            //     ...state,
+            //     currentSet:{
+            //         ...state.currentSet,
+            //         // @ts-ignore
+            //         currentCard:{
+            //             ...state.currentSet?.currentCard,
+            //             x:withSpring(0),
+            //             y:withSpring(0)
+            //         }
+            //     }
+            // }
         case ActionTypes.SET_CURRENT_CARD:
             // @ts-ignore
             return {...state,currentSet:{...state.currentSet,currentCard:action.data}}

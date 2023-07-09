@@ -381,7 +381,7 @@ const MainPage = ({ navigation }:IMainPageProps) => {
                            <Text style={{fontSize:17,color:'#555',fontFamily:'HurmeGeomSemiBold'}}>Show all</Text>
                        </TouchableOpacity>
                    </View>
-                   <ScrollView snapToInterval={330} decelerationRate={"fast"} horizontal style={{paddingBottom:50}}>
+                   <ScrollView showsHorizontalScrollIndicator={false} snapToInterval={330} decelerationRate={"fast"} horizontal style={{paddingBottom:50}}>
                        <View style={{
                            height:150,
                            // width:'100%',
@@ -390,11 +390,11 @@ const MainPage = ({ navigation }:IMainPageProps) => {
                            gap:10,
                        }}>
                            {/**/}
-                           {state.sets.slice(5).map(set=>{
+                           {state.sets.slice(3).map(set=>{
                                return <Pressable onPress={()=>{
                                    dispatch({
                                        type:ActionTypes.FETCH_SET,
-                                       data:set
+                                       data:{...set,flashCardsGame:null}
                                    })
                                    navigation.navigate('SET_PAGE')
                                }} style={{

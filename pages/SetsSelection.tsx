@@ -35,7 +35,7 @@ const SetsSelection = ({navigation}:ISetsSelection) => {
         })
     },[query,state.sets])
     return (
-        <View style={{alignItems:'center'}}>
+        <View style={{flex:1,alignItems:'center'}}>
             <View style={{
                 width:'100%',
                 height:130,
@@ -46,13 +46,14 @@ const SetsSelection = ({navigation}:ISetsSelection) => {
                 <Text style={{color:'#444',fontSize:20,fontFamily:'HurmeGeomBold2'}}>Library</Text>
                 <TouchableOpacity style={{position:'absolute', right:40}}><FontAwesomeIcon color={"#555"} size={22} icon={faPlus}/></TouchableOpacity>
             </View>
-            <ScrollView contentContainerStyle={{
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{
                 alignItems:'center',
-                gap:20
+                gap:20,
+                paddingBottom:20
             }} style={{
-                flexGrow:1,
+                // flexGrow:1,
                 height:'100%',
-                width:'90%',
+                width:'100%',
             }} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>{
                 setRefreshing(true)
                 setTimeout(()=>{
@@ -60,7 +61,7 @@ const SetsSelection = ({navigation}:ISetsSelection) => {
                 },2000)
             }}/>}>
                 {/*j*/}
-                <View style={{width:'100%',height:50,borderBottomWidth:3,borderBottomColor:'#aaa'}}>
+                <View style={{width:'90%',height:50,borderBottomWidth:3,borderBottomColor:'#aaa'}}>
                     <TextInput autoCapitalize={"none"} value={query} onChangeText={text => {
                         setQuery(text)
                     }} onFocus={e=>{
@@ -86,7 +87,7 @@ const SetsSelection = ({navigation}:ISetsSelection) => {
                 </View>
 
                 {sets.length ?
-                    sets.map(set=>{
+                    [...sets].map(set=>{
                     return (<Pressable onPress={()=>{
                         dispatch({
                             type:ActionTypes.FETCH_SET,
@@ -94,7 +95,7 @@ const SetsSelection = ({navigation}:ISetsSelection) => {
                         })
                         navigation.navigate('SET_PAGE')
                     }} style={{
-                        width:'100%',
+                        width:'90%',
                         borderRadius:10,
                         height:100,
                         backgroundColor:'#ccc',

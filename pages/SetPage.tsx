@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
     Animated as AnimatedRN,
     Dimensions,
-    FlatList,
     Pressable,
     ScrollView,
     StyleSheet,
@@ -28,6 +27,7 @@ import {useDispatch} from "react-redux";
 import {Gesture, GestureDetector, PanGestureHandler} from "react-native-gesture-handler";
 import Button from "../components/UI/Button";
 import {NavigationProp, RouteProp} from "@react-navigation/native";
+import MatchGame from "../components/MatchGame";
 let { width } = Dimensions.get('window')
 interface ISetPageProps {
     navigation:NavigationProp<any>,
@@ -35,6 +35,8 @@ interface ISetPageProps {
 }
 const SetPage = ({navigation,route}:ISetPageProps) => {
     let dispatch = useDispatch()
+    const [isVisible, setIsVisible ] = useState<boolean>(false)
+    let matchGameTranslateY = useSharedValue(0)
     const translateY = useSharedValue(0)
     const state = useTypedSelector(state1 => state1.mainReducer)
     // const { words, name }:ISet = route.params
@@ -63,9 +65,17 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
     },[flipped])
     return (
         <>
-            <WordCards words={state.currentSet?.words} translateY={translateY}/>
+        {isVisible && <MatchGame setIsVisible={setIsVisible} translateY={matchGameTranslateY}/>}
+        {isVisible && <WordCards setIsVisible={setIsVisible} words={state.currentSet?.words} translateY={translateY}/>}
             <View style={{width:'100%',height:90,justifyContent:'center',paddingLeft:30,backgroundColor:'#fff'}}>
-                <TouchableOpacity style={{width:50,height:50,justifyContent:'center',alignItems:'center'}} onPress={()=>navigation.goBack()}><FontAwesomeIcon size={23} color={"#888"} icon={faArrowLeft}/></TouchableOpacity>
+                <TouchableOpacity style={{
+                    width:50,
+                    height:50,
+                    justifyContent:'center',
+                    alignItems:'center'
+                }} onPress={()=>navigation.goBack()}>
+                    <FontAwesomeIcon size={23} color={"#888"} icon={faArrowLeft}/>
+                </TouchableOpacity>
             </View>
         <ScrollView>
             <View style={{flex:1,alignItems:'center',paddingBottom:60,paddingTop:30}}>
@@ -132,7 +142,7 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                 <View style={{width:'90%',gap:20,marginTop:10}}>
                     <Button styles={{
                         btn:{
-                            gap:20,
+                            gap:25,
                             alignItems:'center',
                             paddingHorizontal:15,
                         },
@@ -141,6 +151,7 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                             height:styles.exercise.height
                         }
                     }} onPressFn={()=>{
+                        setIsVisible(true)
                         translateY.value = withSpring(-Dimensions.get('window').height,{
                             stiffness:300,
                             velocity:4
@@ -150,13 +161,13 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                         <View style={{
                             width:'70%'
                         }}>
-                            <Text style={{fontFamily:'HurmeGeomBold'}}>Cards</Text>
-                            <Text style={{fontFamily:'HurmeGeom2'}} numberOfLines={1}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
+                            <Text style={{fontSize:20,color:'#555',fontFamily:'HurmeGeomBold'}}>Cards</Text>
+                            {/*<Text style={{fontFamily:'HurmeGeom2'}} numberOfLines={1}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>*/}
                         </View>
                     </Button>
                     <Button styles={{
                         btn:{
-                            gap:20,
+                            gap:25,
                             alignItems:'center',
                             paddingHorizontal:15,
                         },
@@ -167,13 +178,13 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                     }}>
                         <FontAwesomeIcon size={25}  color={'#555'} icon={fa.faBarsProgress}/>
                         <View  style={{width:'70%'}}>
-                            <Text style={{fontFamily:'HurmeGeomBold'}}>Learn</Text>
-                            <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
+                            <Text style={{color:'#555',fontSize:20,fontFamily:'HurmeGeomBold'}}>Learn</Text>
+                            {/*<Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>*/}
                         </View>
                     </Button>
                     <Button styles={{
                         btn:{
-                            gap:20,
+                            gap:25,
                             alignItems:'center',
                             paddingHorizontal:15,
                         },
@@ -184,13 +195,17 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                     }}>
                         <FontAwesomeIcon size={25} color={'#555'} icon={fa.faListCheck}/>
                         <View  style={{width:'70%'}}>
-                            <Text style={{fontFamily:'HurmeGeomBold'}}>Test</Text>
-                            <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
+                            <Text style={{color:'#555',fontSize:20,fontFamily:'HurmeGeomBold'}}>Test</Text>
+                            {/*<Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>*/}
                         </View >
                     </Button>
-                    <Button styles={{
+                    <Button onPressFn={()=>{
+                        setIsVisible(true)
+                        console.log('dlkfdjl')
+                        matchGameTranslateY.value = withSpring(-Dimensions.get('window').height)
+                    }} styles={{
                         btn:{
-                            gap:20,
+                            gap:25,
                             alignItems:'center',
                             paddingHorizontal:15,
                         },
@@ -201,8 +216,8 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                     }}>
                         <FontAwesomeIcon size={25} color={'#555'} icon={fa.faObjectUngroup}/>
                         <View style={{width:'70%'}}>
-                            <Text style={{fontFamily:'HurmeGeomBold'}}>Order</Text>
-                            <Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>
+                            <Text style={{color:'#555',fontSize:20,fontFamily:'HurmeGeomBold'}}>Order</Text>
+                            {/*<Text style={{fontFamily:'HurmeGeom2'}}>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Dolore, repellat!</Text>*/}
                         </View>
                     </Button>
                 </View>
@@ -240,13 +255,13 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                                 }
                             })
                         return (
-                            <GestureDetector gesture={gesture}>
+                            // <GestureDetector gesture={gesture}>
                             <Animated.View style={[styles.word]} >
                                 <Text style={{
                                     fontFamily:'HurmeGeomSemiBold',
                                     fontSize:18,
                                     color:'#333444'
-                                }}>{word.word}{index}</Text>
+                                }}>{word.word}</Text>
                                 <Text style={{
                                     fontFamily:'HurmeGeomSemiBold',
                                     fontSize:18,
@@ -254,11 +269,12 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
                                 }}>{word.translation}</Text>
                                 {/*<Animated.View style={[{zIndex:-1,top:0,left:0,width:'100%',height:'100%',backgroundColor:'#ccc',position:'absolute'},wordStyles]}></Animated.View>*/}
                             </Animated.View>
-                            </GestureDetector>
+                            // </GestureDetector>
                         )
                     })}
                 </View>
             </View>
+        {/*    */}
         </ScrollView>
             </>
     );
@@ -266,7 +282,7 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
 const styles = StyleSheet.create({
     exercise:{
         width:'100%',
-        height:80,
+        height:70,
         backgroundColor:'#ccc',
         borderRadius:10,
         flexDirection:'row',

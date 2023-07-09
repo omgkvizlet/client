@@ -1,14 +1,23 @@
 import React, {SetStateAction, useEffect, useState} from 'react'
-import {ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
-import Animated, {interpolate, useAnimatedStyle, useSharedValue, withSpring, withTiming} from "react-native-reanimated";
+import {RefreshControl, ScrollView, Text, TextInput, TouchableOpacity, View} from "react-native";
+import Animated, {
+    interpolate,
+    useAnimatedStyle,
+    useSharedValue,
+    withRepeat,
+    withSpring,
+    withTiming
+} from "react-native-reanimated";
 import {useActions} from "../hooks/useActions";
 import Button from "../components/UI/Button";
 import {SharedValue} from "react-native-reanimated/lib/types/lib";
 import {NavigationProp} from "@react-navigation/native";
 import {useTypedSelector} from "../hooks/useTypedSelector";
 import {LoadingStatuses} from "../types";
-import {FontAwesomeIcon} from "@fortawesome/react-native-fontawesome";
-import {faLanguage} from "@fortawesome/free-solid-svg-icons";
+import storage from "redux-persist/lib/storage";
+import {registration} from "../store/actions";
+import Svg from "react-native-svg";
+import AnimatedStroke from "../components/AnimatedStroke";
 
 export interface IFormData {
     username:string,
@@ -25,7 +34,18 @@ export interface IInput{
 interface IFormProps{
     navigation:NavigationProp<any>
 }
+const setItem = async(key:string,value:string)=>{
+    return await storage.setItem(key,value)
+}
+const getItem = async (key:string) => {
+    return await storage.getItem(key)
+}
 const Form = ({navigation}:IFormProps) => {
+    useEffect(()=>{
+        setItem('root','hren').then(res=> console.log(res))
+        //
+        getItem('root').then(res=>console.log(res))
+    },[])
     const paths = [
         'm230.38 675.35v-98.41h-102.9c-39.828 0-72.254-34.488-72.254-76.871v-221.91c0-42.395 32.41-76.895 72.254-76.895h460.14c39.828 0 72.227 34.5 72.227 76.895v221.9c0 42.383-32.398 76.871-72.227 76.871v53.953c69.562 0 126.17-58.691 126.17-130.82v-221.9c0-72.133-56.594-130.84-126.17-130.84h-460.14c-69.59 0-126.19 58.703-126.19 130.84v221.9c0 72.133 56.605 130.82 126.19 130.82h48.961v95.617c0 14.676 9.4688 27.984 23.555 33.168 4.0078 1.4766 8.125 2.207 12.168 2.207 9.8516 0 19.309-4.2461 25.98-12.121l100.43-118.86h100.23v-53.953l-125.27 0.003907z',
         'm1072.5 438.12h-311.52v53.953h311.52c39.828 0 72.254 34.5 72.254 76.895v221.87c0 42.395-32.41 76.895-72.254 76.895h-102.89v98.461l-83.172-98.438-274.09 0.003906c-39.816 0-72.227-34.5-72.227-76.895v-221.89c0-42.395 32.41-76.895 72.227-76.895v-53.953c-69.562 0-126.18 58.703-126.18 130.84v221.89c0 72.168 56.605 130.85 126.18 130.85h249.05l100.46 118.92c6.6602 7.8242 16.105 12.047 25.934 12.047 4.043 0 8.1602-0.70703 12.168-2.1836 14.113-5.1836 23.605-18.516 23.605-33.215v-95.582h48.938c69.59 0 126.19-58.691 126.19-130.85l-0.003906-221.87c0-72.145-56.602-130.85-126.19-130.85z',
@@ -67,16 +87,16 @@ const Form = ({navigation}:IFormProps) => {
     useEffect(()=>{
         //
         if(state.status === LoadingStatuses.ERROR){
-            // fromTranslateX.value = 0
+            fromTranslateX.value = 0
         }
         if(state.status === LoadingStatuses.LOADING){
-            // fromTranslateX.value = withSpring(0)
-            // strokeDash.value = withRepeat(
-            //     withTiming(0,
-            //         {duration:2000}),
-            //     -1,
-            //     true
-            // )
+            fromTranslateX.value = withSpring(-500)
+            strokeDash.value = withRepeat(
+                withTiming(0,
+                    {duration:3000}),
+                -1,
+                true
+            )
         }
 
     },[state.status])
@@ -93,12 +113,18 @@ const Form = ({navigation}:IFormProps) => {
             translateX:useSharedValue(10)
         }
     ]
+    const[refreshing,setRefreshing] = useState<boolean>()
     useEffect(()=>{
         scale.value = withSpring(1)
     },[])
     return (
 
-            <ScrollView contentContainerStyle={{
+            <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={()=>{
+                setRefreshing(true)
+                setTimeout(()=>{
+                    setRefreshing(false)
+                },2000)
+            }}/>} bouncesZoom={false} contentContainerStyle={{
                 height:'100%',
                 justifyContent:'center',
                 alignItems:'center',
@@ -114,12 +140,12 @@ const Form = ({navigation}:IFormProps) => {
                     height:150,
                     alignItems:'center',
                 },iconAnimStyles,logoAnimStyles]}>
-                    {/*<Svg width="180" height="180" viewBox="0 0 1200 1200">*/}
-                    {/*    {paths.map(path=>{*/}
-                    {/*        return <AnimatedStroke strokeDashValue={strokeDash} stroke={'#555'} d={path}/>*/}
-                    {/*    })}*/}
-                    {/*</Svg>*/}
-                    <FontAwesomeIcon color={'#555'} size={160} icon={faLanguage}/>
+                    <Svg width="180" height="180" viewBox="0 0 1200 1200">
+                        {paths.map(path=>{
+                            return <AnimatedStroke fill={state.status != LoadingStatuses.LOADING ? '#555' : 'none'} strokeDashValue={strokeDash} stroke={'#555'} d={path}/>
+                        })}
+                    </Svg>
+                    {/*<FontAwesomeIcon color={'#555'} size={160} icon={faLanguage}/>*/}
                 </Animated.View>
             <Animated.View style={[{
                 width:'100%',
@@ -208,7 +234,7 @@ const Form = ({navigation}:IFormProps) => {
                         </Animated.View>
                         <TextInput autoCapitalize={"none"}
                             onFocus={()=>{
-                               translateY.value = withSpring(-30)
+                               translateY.value = withSpring(-34)
                                translateX.value = withSpring(-15)
                             }}
                             style={{
@@ -288,7 +314,10 @@ const Form = ({navigation}:IFormProps) => {
                     <Text style={{fontSize:20, fontFamily:'HurmeGeomBold', color:'#555'}}>Login</Text></Button>
                 </Animated.View>
                 <TouchableOpacity onPress={()=>{
-
+                    registration({
+                        username:inputs[0].state[0],
+                        password:inputs[1].state[0]
+                    })
                     // navigation.navigate('REGISTRATION')
                 }} style={{
                     width:'100%',

@@ -49,11 +49,22 @@ export enum AuthActionTypes {
 
     AUTH_ERROR = "AUTH_ERROR",
 
-    AUTH_LOADING = "AUTH_LOADING"
+    AUTH_LOADING = "AUTH_LOADING",
 
+    SET_USER = "SET_USER",
 }
 
 export enum ActionTypes {
+    LEARN_WORD = "LEARN_WORD",
+
+    WRONG_MATCH = "WRONG_MATCH",
+
+    CORRECT_MATCH = "CORRECT_MATCH",
+
+    SET_GUESSING_CARD = "SET_GUESSING_CARD",
+
+    SET_GUESSING_CARD2 = "SET_GUESSING_CARD2",
+
     REMOVE_WORD = "REMOVE_WORD",
 
     SWITCH_LANGS = "SWITCH_LANGS",
@@ -93,8 +104,10 @@ export interface IState {
 
     sets:ISet[],
 
-    currentSet?:ISet
+    currentSet?:ISet,
+
 }
+
 
 export interface IWord {
     word:string,
@@ -112,6 +125,7 @@ export interface ICurrentCard {
     y:SharedValue<number> | number
 }
 export interface ISet {
+
     fromLanguage:string,
 
     toLanguage:string,
@@ -124,5 +138,26 @@ export interface ISet {
 
     name:string,
 
+    flashCardsGame?:IFlashCardsGame,
+
+    matchGame?:IMatchGame,
+
     currentCard?:ICurrentCard
+}
+
+export interface IFlashCardsGame {
+    learned:boolean
+
+    knowThatWords?:IWord[],
+
+    isReturned:boolean,
+
+    learnYetWords?:IWord[]
+}
+export interface IMatchGame {
+    guessingCard1: { index: number, word: string },
+
+    guessingCard2: { index: number, translation: string },
+
+    isWrong?: boolean,
 }

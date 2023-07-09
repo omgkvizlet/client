@@ -43,9 +43,7 @@ const NavBar = ({y}:INavBarProps) => {
             )
         }
     })
-    useEffect(()=>{
-        console.log(state)
-    },[])
+
     return (
         <Animated.View style={[{
             backgroundColor:'#e6e6e6',
@@ -72,7 +70,7 @@ const NavBar = ({y}:INavBarProps) => {
                 fontFamily:'HurmeGeomBold',
                 fontSize:22,
                 color:'#333'
-            }}>Eblan</Text>
+            }}>{state.user["username"]}</Text>
 
             </View>
             <TouchableOpacity onPress={()=>{

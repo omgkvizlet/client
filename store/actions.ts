@@ -8,11 +8,10 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 export  const loginActionCreator =  (formData:IFormData,navigation:NavigationProp<any>) => {
     return async function(dispatch:Dispatch<IAction>) {
         try {
-            console.log('FORMDATA',formData)
             dispatch({
                 type:AuthActionTypes.AUTH_LOADING,
             })
-            const response = await AuthService.login(formData)
+            // const response = await AuthService.login(formData)
 
             // let response = {data: {user: formData}}
             // if( formData.password != 'andriy_hrin' || formData.username != 'andriy_hrinenko@gmail.com' )
@@ -22,17 +21,14 @@ export  const loginActionCreator =  (formData:IFormData,navigation:NavigationPro
             //         ? 'There isn\'t such user '
             //         : 'Password is not correct'
             // })
-            // setTimeout(()=>{
-            //     dispatch({
-            //         type:AuthActionTypes.AUTH_SUCCESS,
-            //         data:{user:formData,navigation:navigation}
-            //     })
-            // },6000)
-            await AsyncStorage.setItem('user',JSON.stringify({...formData,token:response.data.token}))
-            dispatch({
-                type: AuthActionTypes.AUTH_SUCCESS,
-                data: {...response.data, user: formData}
-            })
+
+            // await AsyncStorage.setItem('user',JSON.stringify({...formData,token:response.data.token}))
+            setTimeout(()=>{
+                dispatch({
+                    type: AuthActionTypes.AUTH_SUCCESS,
+                    data: { user: formData}
+                })
+            },4000)
         } catch (e:Error | any) {
             dispatch({
                 type:AuthActionTypes.AUTH_ERROR,
@@ -45,7 +41,7 @@ export  const loginActionCreator =  (formData:IFormData,navigation:NavigationPro
 export  const logoutActionCreator =  (navigation:NavigationProp<any>) => {
     return async function(dispatch:Dispatch<IAction>) {
         try {
-            await AsyncStorage.removeItem('user')
+            // await AsyncStorage.removeItem('user')
             dispatch({
                 type:AuthActionTypes.AUTH_LOGOUT,
                 data: {navigation}
@@ -56,6 +52,46 @@ export  const logoutActionCreator =  (navigation:NavigationProp<any>) => {
                 data:e
             })
 
+        }
+    }
+}
+export const registration = (formData:IFormData) => {
+    return async function(dispatch:Dispatch<IAction>){
+        try {
+            dispatch({
+                type:AuthActionTypes.AUTH_LOADING,
+            })
+            const response = await AuthService.registration(formData)
+
+            await AsyncStorage.setItem('user',JSON.stringify({token:response.data.token,user:response.data.user}))
+            console.log(response)
+            //
+            dispatch({
+                type:AuthActionTypes.AUTH_SUCCESS,
+                data:response.data.user
+            })
+        } catch (e) {
+            dispatch({
+                type:AuthActionTypes.AUTH_ERROR,
+                data:e
+            })
+        }
+    }
+}
+export const fetchUser = () => {
+    return async function(dispatch:Dispatch<IAction>){
+        try {
+            dispatch({type:AuthActionTypes.AUTH_LOADING})
+            const user = await AsyncStorage.getItem('user')
+            setTimeout(()=>dispatch({
+                type:AuthActionTypes.SET_USER,
+                data:user
+            }),4000)
+        } catch (e) {
+            dispatch({
+                type:AuthActionTypes.AUTH_ERROR,
+                data:e
+            })
         }
     }
 }
