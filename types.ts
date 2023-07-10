@@ -55,6 +55,8 @@ export enum AuthActionTypes {
 }
 
 export enum ActionTypes {
+    STOP_WATCH = "STOP_WATCH",
+
     LEARN_WORD = "LEARN_WORD",
 
     WRONG_MATCH = "WRONG_MATCH",
@@ -134,13 +136,13 @@ export interface ISet {
 
     visibility:'private'| 'public',
 
-    words:IWord[],
+    words:any[],
 
     name:string,
 
-    flashCardsGame?:IFlashCardsGame,
+    flashCardsGame?:IFlashCardsGame|null,
 
-    matchGame?:IMatchGame,
+    matchGame?:IMatchGame|null,
 
     currentCard?:ICurrentCard
 }
@@ -160,4 +162,8 @@ export interface IMatchGame {
     guessingCard2: { index: number, translation: string },
 
     isWrong?: boolean,
+
+    isRunning?:boolean,
+
+    doneWords:number
 }

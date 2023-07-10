@@ -10,7 +10,9 @@ import Animated, {
     withTiming
 } from "react-native-reanimated";
 import {useTypedSelector} from "../../hooks/useTypedSelector";
-import {IMatchGame} from "../../types";
+import {ActionTypes, IMatchGame} from "../../types";
+import * as Haptics from 'expo-haptics'
+import {useDispatch} from "react-redux";
 
 interface IRippleBtnProps {
     style?:StyleSheet,
@@ -23,9 +25,11 @@ interface IRippleBtnProps {
 
     setIsWrong:any,
 
-    index:number
+    index:number,
+
 }
 const RippleBtn:FC<IRippleBtnProps> = ({rippleColor, children, style, onPressFn, index, setIsWrong}) => {
+    const dispatch = useDispatch()
     const bg = useSharedValue(rippleColor)
 
     const cardRef = useRef<Animated.View>(null)
@@ -46,7 +50,7 @@ const RippleBtn:FC<IRippleBtnProps> = ({rippleColor, children, style, onPressFn,
 
     const centerY = useSharedValue(0)
 
-    const opacity = useSharedValue(0.2)
+    const opacity = useSharedValue(0.4)
 
     const cardOpacity = useSharedValue(1)
 
@@ -84,57 +88,58 @@ const RippleBtn:FC<IRippleBtnProps> = ({rippleColor, children, style, onPressFn,
     })
     useEffect(()=>{
         if(matchGame) {
-            const {guessingCard1, guessingCard2} = matchGame as IMatchGame
-            if (guessingCard2?.index == index || guessingCard1?.index == index) {
-                if (guessingCard2?.word.toLowerCase() === guessingCard1.word.toLowerCase()) {
-                    bg.value = withTiming('#00aa00')
 
-                    // cardOpacity.value = withTiming(0)
+            const {guessingCard1, guessingCard2} = matchGame as IMatchGame
+
+            if (guessingCard2?.index == index || guessingCard1?.index == index) {
+                if (guessingCard1?.word.toLowerCase() == guessingCard2?.word?.toLowerCase()) {
+                    dispatch({
+                        type:ActionTypes.CORRECT_MATCH
+                    })
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+                    bg.value = withTiming('#00aa00')
+                    cardOpacity.value = withDelay(250, withTiming(0))
                 } else {
-                    setIsWrong(true)
-                    // translateX.value = withSequence(
-                    //     withTiming(-5,{duration:50}),
-                    //     withTiming(5,{duration:50}),
-                    //     withTiming(-5,{duration:50}),
-                    //     withTiming(0,{duration:50})
-                    // )
+                    translateX.value = withSequence(
+                        withTiming(-5, {duration: 50}),
+                        withTiming(5, {duration: 50}),
+                        withTiming(-5, {duration: 50}),
+                        withTiming(0, {duration: 50})
+                    )
 
                     bg.value = withTiming('#aa0000')
-                    opacity.value = withDelay(500,withTiming(0,{duration:250}))
-                    scale.value = withDelay(750,withTiming(0))
-                    bg.value = withDelay(1000,withTiming('#000'))
-                    setTimeout(()=>{
-                        setIsWrong(false)
-                    },250)
+                    opacity.value = withDelay(250, withTiming(0, {duration: 250}))
+                    scale.value = withDelay(250, withTiming(0))
+                    bg.value = withDelay(250, withTiming('#777'))
+                //
 
                 }
             }
         }
-        // opacity.value = withDelay(250,withTiming(0))
-       //  scale.value = withTiming(0)
-
+    //
     },[matchGame?.isWrong])
-    // useEffect(()=>{
-    //     console.log('opacity')
-    //     // if()
-    //     bg.value = state.currentSet?.matchGame?.isWrong ? '#aa0000' : '#00aa00'
-    // },[state.currentSet?.matchGame?.isWrong])
+    useEffect(()=>{
+
+    },[cardOpacity.value])
     const pressGestureEvent = useAnimatedGestureHandler({
+
         onStart:(event)=>{
+            opacity.value = 0.4
             console.log('AAAAA',scale.value)
             if(scale.value > 0){
+                scale.value = withTiming(0,{duration:500})
                 centerX.value = event.x
                 centerY.value = event.y
-                scale.value = withTiming(0)
-                opacity.value = withTiming(0)
+                //
+                // opacity.value = withTiming(0)
                 return
             }
             //
             runOnJS(onPressFn)()
-            opacity.value = withTiming(0.2)
             centerX.value = event.x
             centerY.value = event.y
-            scale.value = withTiming(3,{duration:750})
+            //
+            scale.value = withTiming(3,{duration:500})
         },
         onFinish:()=>{
             // opacity.value = withTiming(0)

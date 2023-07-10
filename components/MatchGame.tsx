@@ -16,6 +16,8 @@ import Ripple from 'react-native-material-ripple'
 import {SharedValue} from "react-native-reanimated/lib/types/lib";
 import {useDispatch} from "react-redux";
 import {ActionTypes, IMatchGame} from "../types";
+import translate from "translate";
+import { LanguagesAbbreviations } from '../types'
 interface IMatchGameProps {
     translateY:SharedValue<number>,
 
@@ -25,7 +27,6 @@ const { width, height } = Dimensions.get('window')
 const shuffleArray = (array:any[]):void => {
     for (let i = 0; i < array.length; i++) {
         const el = array[i]
-        console.log('ELLL')
         const randomIndex = Math.floor(Math.random()*array.length)
         array[i] = array[randomIndex]
 
@@ -34,7 +35,6 @@ const shuffleArray = (array:any[]):void => {
 }
 
 const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
-    const[guessingCard,setGuessingCard] = useState(null)
     let dispatch = useDispatch()
 
     const [ isWrong, setIsWrong ] = useState<boolean>(false)
@@ -71,39 +71,34 @@ const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
         ...state.currentSet?.words.map(word=>word.word),
         ...state.currentSet?.words.map(word=>word.translation)
     ])
-    const [ idx,setIdx ] = useState<number>()
-
     let animStyles = useAnimatedStyle(()=>{
         return {
             opacity:opacity.value
         }
     })
     useEffect(()=>{
-        setTime(0)
-
-        setInterval(() => {
-                setTime(prevState=>prevState + 0.1);
-            }, 100);
-    },[])
-
+        console.log('AAAAAAA',state.currentSet?.matchGame?.doneWords)
+    },[state.currentSet?.matchGame?.doneWords])
     useEffect(()=>{
-        shuffleArray(wordsAndTranslations)
-    },[])
+        let interval;
+        if(state.currentSet?.matchGame?.isRunning) {
+            interval = setInterval(() => {
+                setTime(prevState => prevState + 0.1);
+            }, 100);
+        }
+        return () => clearInterval(interval)
+
+    },[state.currentSet?.matchGame?.isRunning])
+
+    // useEffect(()=>{
+    //     console.log(state.currentSet?.matchGame)
+    //     shuffleArray(wordsAndTranslations)
+    // },[])
     let matchGameAnimStyles = useAnimatedStyle(()=>{
         return {
             transform:[{translateY:translateY.value}]
         }
     })
-    useEffect(()=>{
-        // if (isWrong) {
-        //     mistakeTranslateY.value = withSequence(
-        //         withDelay(250,withTiming(-height/2)),
-        //         withDelay(1000,withTiming(0))
-        //     )
-        // mistakeTranslateY.value = withTiming(-height/2)
-
-        // }
-    },[isWrong])
     // @ts-ignore
     return (
         <Animated.View style={[{
@@ -169,7 +164,11 @@ const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
                     textTransform:'uppercase',
                     color:'#555'
                 }}>{time.toFixed(1)} Seconds</Text>
-                <TouchableOpacity style={{
+                <TouchableOpacity onPress={()=>{
+                    dispatch({
+                        type:ActionTypes.STOP_WATCH,
+                    })
+                }} style={{
                     width:50,
                     height:50,
                     justifyContent:'center',
@@ -183,14 +182,15 @@ const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
                 alignItems:'center',
                 overflow:'hidden'
             }}>
-                { isWrong &&  <Animated.Text style={[{
-                    position:'absolute',
-                    fontFamily:'HurmeGeomBold',
-                    fontSize:110,
-                    zIndex:2,
+                {/*{ isWrong &&  <Animated.Text style={[{*/}
+                {/*    position:'absolute',*/}
+                {/*    fontFamily:'HurmeGeomBold',*/}
+                {/*    fontSize:110,*/}
+                {/*    zIndex:2,*/}
 
-                    color:'#cc3300',
-                }, mistakeStyles ]}>+1 Sek</Animated.Text> }
+                {/*    color:'#cc3300',*/}
+                {/*}, mistakeStyles ]}>+1 Sek</Animated.Text> }*/}
+
             <View style={{
                 // justifyContent:'center',
                 paddingBottom:70,
@@ -203,14 +203,24 @@ const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
 
                 {/**/}
                 {/*@ts-ignore*/}
-                {wordsAndTranslations.map((word, index)=>{
-                    console.log('ARRAY',wordsAndTranslations)
-                    return <RippleBtn setIsWrong={setIsWrong} index={index} onPressFn={()=>{
-                        console.log(state.currentSet?.matchGame?.guessingCard1)
+                {[...wordsAndTranslations].map((word, index)=>{
+                    return <RippleBtn setIsWrong={setIsWrong} index={index} onPressFn={async ()=>{
                         if(state.currentSet?.matchGame?.guessingCard1 && state.currentSet.matchGame.guessingCard1?.index !== index) {
                                 dispatch({
                                     type:ActionTypes.SET_GUESSING_CARD2,
-                                    data:{ index, word }
+                                    data:{
+                                        index,
+                                        word
+                                        // word:await translate(word,{
+                                        //     key:'AIzaSyCTbugGk9WPCvHZmv8gH0iLa79vtbtKrdE',
+                                        //     // @ts-ignore
+                                        //     from:state.currentSet.fromLanguage,
+                                        //     // @ts-ignore
+                                        //     to:state.currentSet.toLanguage,
+                                        //
+                                        //     engine:'google'
+                                        // })
+                                    }
                                 })
                                 dispatch({
                                     type:ActionTypes.WRONG_MATCH,
@@ -229,18 +239,18 @@ const MatchGame:React.FC<IMatchGameProps> = ({translateY, setIsVisible}) => {
                                 type:ActionTypes.SET_GUESSING_CARD,
                                 data:{index,word}
                             })
-
-                    }} rippleColor={'#000'} style={{
+                    //
+                    }} rippleColor={'#777'} style={{
                         borderRadius: 5,
                         borderWidth: 1,
                         borderColor: '#555',
                         height:'25%',
-                        width:'31.5441%'
+                        width:'30%'
                     }}>
                         <Pressable
                             style={{width: '100%', height: '100%', justifyContent: 'center', alignItems: 'center'}}>
                             <Animated.Text style={{fontFamily: 'HurmeGeomSemiBold', fontSize: 20, color: '#555'}}>
-                                {wordsAndTranslations[index]}
+                                {word}
                             </Animated.Text>
                         </Pressable>
                     {/*    */}

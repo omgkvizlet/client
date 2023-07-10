@@ -4,8 +4,11 @@ import Animated, {
     interpolate,
     interpolateColor,
     runOnJS,
-    useAnimatedStyle, useSharedValue, withDelay, withSequence,
-    withSpring, withTiming
+    useAnimatedStyle,
+    useSharedValue,
+    withSequence,
+    withSpring,
+    withTiming
 } from "react-native-reanimated";
 import {Dimensions, Pressable} from "react-native";
 import {Gesture, GestureDetector} from "react-native-gesture-handler";
@@ -14,6 +17,7 @@ import {useTypedSelector} from "../hooks/useTypedSelector";
 import {SharedValue} from "react-native-reanimated/lib/types/lib";
 import {ICounters} from "./WordCards";
 import {useDispatch} from "react-redux";
+
 const { width } = Dimensions.get('window')
 interface ICardProps {
     word:IWord,
@@ -36,7 +40,7 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
     const dispatch = useDispatch()
     const[flipped,setFlipped] = useState<boolean>(false)
 
-    let [ counter, setCounter ] = useState(1)
+    let [ beyond, setCounter ] = useState(1)
 
     let state = useTypedSelector(state1 => state1.mainReducer)
 
@@ -57,19 +61,36 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
         }
     },[state.currentSet?.flashCardsGame?.isReturned])
     let cardAnimStyles = useAnimatedStyle(()=>{
+        // @ts-ignore
         return {
-            transform:[{
+
+
+            transform:[
+
+                {
                 translateY:cardTranslateY.value
             },
                 {
                     translateX:cardTranslateX.value,
+
                 },
                 {
                     "rotateY":rotateY.value.toString() + 'deg'
                 },
+                {
+                    rotateZ:interpolate(
+                        cardTranslateX.value,
+                        [-width,0,width],
+                        // @ts-ignore
+                        [-35,0,35],
+                        Extrapolation.CLAMP
+                    ) + 'deg'
+                },
+
 
             ],
             backgroundColor:interpolateColor(cardTranslateX.value,[-100,0,100],['#ff8503','#ddd','#448f6e']),
+
 
         }
     })
@@ -80,9 +101,9 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
                 [0,1,0],
                 Extrapolation.CLAMP
             ),
-            transform:[{
-                rotateY:rotateY.value + 'deg'
-            }]
+            // transform:[{
+            //     rotateY:rotateY.value + 'deg'
+            // }]
         }
     })
     let learnYetAnimStyle = useAnimatedStyle(()=>{
@@ -96,7 +117,7 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
     })
     let knowThatAnimStyle = useAnimatedStyle(()=>{
         return {
-            opacity:interpolate(cardTranslateX.value,[0,width/3],[0,1])
+            opacity:interpolate(cardTranslateX.value,[-width/3,0,width/3],[1,0,1])
         }
     })
     useEffect(()=>{
@@ -128,10 +149,10 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
                     data:false
                 }))
                 runOnJS(setCounters)({...counters,yetLearn:counters.yetLearn + 1})
-                cardTranslateX.value = withSpring(-500)
+                cardTranslateX.value = withSpring(-600)
                 console.log(state.currentSet?.words.length)
                 scaleX.value = withTiming(scaleX.value + width/state?.currentSet?.words?.length)
-                translateX.value = withSequence(withTiming(-500),withTiming(0))
+                translateX.value = withSequence(withTiming(-600),withTiming(0))
 
             }
             else if(cardTranslateX.value > width/3){
@@ -143,8 +164,8 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
                 // runOnJS(setIdx)(index)
                 runOnJS(setCounters)({...counters,knowThat:counters.knowThat + 1})
                 scaleX.value = withTiming(scaleX.value + width/state?.currentSet?.words?.length)
-                cardTranslateX.value = withSpring(500)
-                translateX.value = withSequence(withTiming(500),withTiming(0))
+                cardTranslateX.value = withSpring(600)
+                translateX.value = withSequence(withTiming(600),withTiming(0))
 
             }
             else if(cardTranslateX.value  > -width/3 || cardTranslateX.value < width/3){
@@ -167,8 +188,9 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
                 // @ts-ignore
                 zIndex:state?.currentSet?.words?.length - index,
                 width:'85%',
-                height:'85%',
-                shadowOpacity:0,
+                height:'90%',
+                shadowOpacity:1,
+                elevation:4,
                 position:'absolute',
                 shadowColor:'#ccc',
                 shadowOffset:{
@@ -186,31 +208,43 @@ const Card = ({ setCounters, counters, scaleX, word, index, idx, setIdx, transla
                     width:'100%',
                     height:'100%',
                     borderRadius:15,
+                    position:'relative',
                     backgroundColor:'#ddd',
                     justifyContent:'center',
                     alignItems:'center'
                 }}>
-                    <Animated.Text style={[{
-                        fontSize:35,
-                        position:'absolute',
-                        fontFamily:'HurmeGeomBold',
-                        color:'#ff8503',
-                    },learnYetAnimStyle]}>
-                        Learn yet
-                    </Animated.Text>
+                    {/*<Animated.Text style={[{*/}
+                    {/*    fontSize:35,*/}
+                    {/*    position:'absolute',*/}
+                    {/*    fontFamily:'HurmeGeomBold',*/}
+                    {/*    color:'#ff8503',*/}
+                    {/*},learnYetAnimStyle]}>*/}
+                    {/*    Learn yet*/}
+                    {/*</Animated.Text>*/}
                     <Animated.Text style={[{
                         fontSize:35,
                         position:'absolute',
                         fontFamily:'HurmeGeomBold',
                         color:'#448f6e',
                     },knowThatAnimStyle]}>
-                        Know that
+                        {cardTranslateX.value > 0 ? 'Know that' : 'Learn yet'}
                     </Animated.Text>
                     <Animated.Text style={[{
                         fontFamily:'HurmeGeomBold',
                         fontSize:35,
+                        // backfaceVisibility:'hidden',
+                        position:'absolute',
                         color:'#555666'
-                    },wordAnimStyle]}>{flipped ? word.word : word.translation}</Animated.Text>
+                    },wordAnimStyle]}>HUY</Animated.Text>
+                    <Animated.Text style={[{
+                        fontFamily:'HurmeGeomBold',
+                        fontSize:35,
+                        backfaceVisibility:'hidden',
+                        position:'absolute',
+                        transform:[{translateY: 100},{rotateY:180+'deg'}],
+                        color:'#555666'
+                    },wordAnimStyle]}>hren</Animated.Text>
+                {/*    */}
                 </Pressable>
             </Animated.View>
         </GestureDetector>

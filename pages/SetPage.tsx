@@ -33,18 +33,16 @@ interface ISetPageProps {
     navigation:NavigationProp<any>,
     route:RouteProp<any>
 }
-const SetPage = ({navigation,route}:ISetPageProps) => {
+const SetPage = ({navigation}:ISetPageProps) => {
     let dispatch = useDispatch()
     const [isVisible, setIsVisible ] = useState<boolean>(false)
     let matchGameTranslateY = useSharedValue(0)
     const translateY = useSharedValue(0)
     const state = useTypedSelector(state1 => state1.mainReducer)
-    // const { words, name }:ISet = route.params
     let rotateX = useRef(new AnimatedRN.Value(0))
     const [flipped,setFlipped] = useState(false)
-    let swipeGesture = Gesture.Pan()
-        .onUpdate(e=>{
-        })
+
+
     useEffect(()=>{
         dispatch({
             type:ActionTypes.SET_CURRENT_CARD,
@@ -65,8 +63,8 @@ const SetPage = ({navigation,route}:ISetPageProps) => {
     },[flipped])
     return (
         <>
-        {isVisible && <MatchGame setIsVisible={setIsVisible} translateY={matchGameTranslateY}/>}
-        {isVisible && <WordCards setIsVisible={setIsVisible} words={state.currentSet?.words} translateY={translateY}/>}
+        {isVisible && translateY.value ==0 && <MatchGame setIsVisible={setIsVisible} translateY={matchGameTranslateY}/>}
+        {isVisible && matchGameTranslateY.value == 0 &&  <WordCards navigation={navigation} setIsVisible={setIsVisible} words={state.currentSet?.words} translateY={translateY}/>}
             <View style={{width:'100%',height:90,justifyContent:'center',paddingLeft:30,backgroundColor:'#fff'}}>
                 <TouchableOpacity style={{
                     width:50,

@@ -1,36 +1,40 @@
-import {ActionTypes, IAction, IState, Languages} from "../../types";
+import {ActionTypes, IAction, IState, Languages, LanguagesAbbreviations} from "../../types";
 
 
 let initialState:IState = {
     sets:[{
-        //
         randomArr:[1,2,3,4,5,6],
         name:'Transport',
-        words:[{
-            word:'train',
-            translation:'der Zug',
+        words:[
+            {
+            word:'word',
+            translation:'translation',
             partOfLanguage:'noun',
             sex:'m',
-        },{
-        word:'bus',
-        translation:'der Bus',
-        partOfLanguage:'noun',
-        sex:'m',
-    },{
-        word:'vehicle',
-        translation:'das Auto',
-        partOfLanguage:'noun',
-        sex:'m',
-    },{
-        word:'subway',
-        translation:'der U-Bahn',
-        partOfLanguage:'noun',
-        sex:'m',
-    }],
+            },
+            {
+                word:'word',
+                translation: 'translation',
+                partOfLanguage:'noun',
+                sex:'m',
+            },
+            {
+                word:'word',
+                translation:'translation',
+                partOfLanguage:'noun',
+                sex:'m',
+            },
+            {
+                word:'word',
+                translation:'translation',
+                partOfLanguage:'noun',
+                sex:'m',
+            }
+    ],
         // @ts-ignore
-        fromLanguage:Languages['English'],
+        fromLanguage:LanguagesAbbreviations['English'],
         // @ts-ignore
-        toLanguage:Languages['German'],
+        toLanguage:LanguagesAbbreviations['German'],
         visibility:'private',
     },{
         name:'Food',
@@ -145,6 +149,18 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
             })}
         case ActionTypes.FETCH_SET:
             return {...state, currentSet:action.data}
+        case ActionTypes.CORRECT_MATCH:
+            return {
+                ...state,
+                currentSet:{
+                    ...state.currentSet,
+                    matchGame:{
+                        ...state.currentSet?.matchGame,
+                        // @ts-ignore
+                        doneWords:state?.currentSet?.matchGame?.doneWords + 2
+                    }
+                }
+            }
         case ActionTypes.LEARN_WORD:
             return {
                 ...state,
@@ -165,6 +181,19 @@ export const mainReducer = (state = initialState, action:IAction):IState => {
         case ActionTypes.CHANGE_LANG2:
             console.log('2');
             return {...state,currentLang2:action.data}
+
+        case ActionTypes.STOP_WATCH:
+            return {
+                ...state,
+                currentSet:{
+                    ...state.currentSet,
+                    matchGame:{
+                        ...state.currentSet?.matchGame,
+                        isRunning:!state.currentSet?.matchGame?.isRunning
+                    }
+                }
+            }
+
         case ActionTypes.RETURN_CARD:
             console.log('lkdjflsj')
             return {

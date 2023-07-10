@@ -18,6 +18,7 @@ import {useTypedSelector} from "../hooks/useTypedSelector";
 import {SharedValue} from "react-native-reanimated/lib/types/lib";
 import {ActionTypes, IAction, IWord} from "../types";
 import {useDispatch} from "react-redux";
+import {NavigationProp} from "@react-navigation/native";
 
 const { width } = Dimensions.get('window')
 interface IWordCardsProps {
@@ -25,14 +26,16 @@ interface IWordCardsProps {
 
     translateY:SharedValue<number>
 
-    setIsVisible:any
+    setIsVisible:any,
+
+    navigation:NavigationProp<any>
 }
 export interface ICounters {
     yetLearn:number,
 
     knowThat:number
 }
-const WordCards = ({ words, translateY, setIsVisible }:IWordCardsProps) => {
+const WordCards = ({ words, translateY, setIsVisible, navigation }:IWordCardsProps) => {
     let[counters,setCounters] = useState<ICounters>({
         yetLearn:0,
         knowThat:0
@@ -71,6 +74,7 @@ const WordCards = ({ words, translateY, setIsVisible }:IWordCardsProps) => {
             }]
         }
     })
+
 
     useEffect(()=>{
         console.log(idx)
@@ -233,7 +237,12 @@ const WordCards = ({ words, translateY, setIsVisible }:IWordCardsProps) => {
                 flexDirection:'row',
                 alignItems:'center',
             }}>
-                <TouchableOpacity onPress={()=>{
+                <TouchableOpacity style={{
+                    width:50,
+                    height:50,
+                    justifyContent:'center',
+                    alignItems:'center'
+                }} onPress={()=>{
 
                     if(idx>0){
                         setIndex(idx-1)

@@ -19,6 +19,7 @@ const Button = ({children,onPressFn,styles}:IButtonProps) => {
               width:0,
               height:shadowOffsetHeight.value
             },
+            elevation:5,
             transform:[{translateY:interpolate(
                 shadowOffsetHeight.value,
                     [10,0],

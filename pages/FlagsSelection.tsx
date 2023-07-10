@@ -4,6 +4,13 @@ import {ActionTypes, Langs} from "../types";
 import {useFonts} from 'expo-font'
 import {useDispatch} from "react-redux";
 import {useTypedSelector} from "../hooks/useTypedSelector";
+import {NavigationProp, RouteProp} from "@react-navigation/native";
+
+interface IFlasgSelectionProps {
+    navigation:NavigationProp<any>,
+
+    route: RouteProp<any>
+}
 
 const FlagsSelection = ({navigation,route}) => {
     let dispatch = useDispatch()
@@ -46,7 +53,7 @@ const FlagsSelection = ({navigation,route}) => {
                                style={{
                                    width:40,
                                    height:40,
-                                   borderRadius:'50%'
+                                   borderRadius:20
                         }}
                         />
                         <Text style={{

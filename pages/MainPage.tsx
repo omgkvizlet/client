@@ -15,7 +15,7 @@ import NavBar from "../components/NavBar";
 import {v2} from '@google-cloud/translate'
 import * as Speech from 'expo-speech'
 import { useTypedSelector } from "../hooks/useTypedSelector";
-import {ActionTypes, IWord, Langs, Languages, LanguagesAbbreviations} from "../types";
+import {ActionTypes, ISet, IWord, Langs, Languages, LanguagesAbbreviations} from "../types";
 import Animated, {useAnimatedScrollHandler, useAnimatedStyle, useSharedValue, withTiming} from 'react-native-reanimated'
 import { FontAwesomeIcon } from "@fortawesome/react-native-fontawesome";
 import { faToiletPaper, faXmark, faArrowRight, faVolumeUp, faSquare, faLock } from '@fortawesome/free-solid-svg-icons'
@@ -115,7 +115,7 @@ const MainPage = ({ navigation }:IMainPageProps) => {
                        <Image style={{
                            width:40,
                            height:40,
-                           borderRadius:'50%'
+                           borderRadius:40/2
                        }} source={{
                            // @ts-ignore
                            uri:Langs[state.currentLang1],
@@ -164,7 +164,7 @@ const MainPage = ({ navigation }:IMainPageProps) => {
                        <Image style={{
                            width:40,
                            height:40,
-                           borderRadius:'50%'
+                           borderRadius:40/2
                        }} source={{
                            // @ts-ignore
                            uri:Langs[state.currentLang2],
@@ -394,7 +394,14 @@ const MainPage = ({ navigation }:IMainPageProps) => {
                                return <Pressable onPress={()=>{
                                    dispatch({
                                        type:ActionTypes.FETCH_SET,
-                                       data:{...set,flashCardsGame:null}
+                                       data: {
+                                           ...set, flashCardsGame: null, matchGame: {
+                                               guessingCard2: null,
+                                               guessingCard1: null,
+                                               isRunning: false,
+                                               doneWords: 0,
+                                           }
+                                       }
                                    })
                                    navigation.navigate('SET_PAGE')
                                }} style={{

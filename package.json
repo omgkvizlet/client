@@ -9,6 +9,7 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/webpack-config": "^18.1.1",
     "@fortawesome/free-brands-svg-icons": "^6.4.0",
     "@fortawesome/free-regular-svg-icons": "^6.4.0",
     "@fortawesome/free-solid-svg-icons": "^6.4.0",
@@ -18,8 +19,9 @@
     "@react-native-picker/picker": "2.4.8",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/stack": "^6.3.17",
+    "@shopify/react-native-performance": "^4.1.2",
     "axios": "^1.4.0",
-    "expo": "~48.0.18",
+    "expo": "^49.0.0",
     "expo-device": "~5.2.1",
     "expo-font": "~11.1.1",
     "expo-haptics": "^12.2.1",
@@ -39,6 +41,7 @@
     "redux-thunk": "^2.4.2",
     "thunk": "^0.0.1",
     "translate": "^2.0.2",
+    "typescript": "^4.9.4",
     "uninstall": "^0.0.0"
   },
   "devDependencies": {
@@ -51,6 +54,7 @@
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-react": "^7.32.2",
+    "react-native-performance-monitor": "^2.0.0",
     "typescript": "^5.1.6"
   },
   "private": true

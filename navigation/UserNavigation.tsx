@@ -10,7 +10,6 @@ const UserNavigation = () => {
         }}>
             <Stack.Screen name={'LOGIN'} component={Form}/>
             <Stack.Screen name={'REGISTRATION'} component={RegistrationPage}/>
-
         </Stack.Navigator>
     );
 };
